@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">VKMusic</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="search">Шукати</string>
+    <string name="my_music">Мої Аудіозаписи</string>
+    <string name="popular">Популярне</string>
+    <string name="recomend">Рекомендовано</string>
+    <integer name="com_vk_sdk_AppId">5152034</integer>
+</resources>
