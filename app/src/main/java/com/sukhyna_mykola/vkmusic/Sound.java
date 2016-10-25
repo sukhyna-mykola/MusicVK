@@ -1,36 +1,67 @@
 package com.sukhyna_mykola.vkmusic;
 
+import com.vk.sdk.api.model.VKApiAudio;
+
 /**
- * Created by mikola on 23.10.2016.
+ * Created by mikola on 24.10.2016.
  */
 
-public class Sound  {
-    private String mTitle;
-    private String mArtist;
-    private String mURL;
-    private int mDuration;
+public class Sound {
 
-    public Sound(String title, String artist, String URL, int duration) {
-        mTitle = title;
-        mArtist = artist;
-        mURL = URL;
-        mDuration = duration;
+    boolean state;
+    String duration;
+    String url;
+    String title;
+    String artist;
+
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTitle() {
+        return title;
+    }
 
-        return mTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getArtist() {
-        return mArtist;
+        return artist;
     }
 
-    public String getURL() {
-        return mURL;
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
-    public int getDuration() {
-        return mDuration;
+    public Sound(boolean state, String duration, String url, String title, String artist) {
+
+        this.state = state;
+        this.duration = duration;
+        this.url = url;
+        this.title = title;
+        this.artist = artist;
+    }
+
+    public String getDuration() {
+
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

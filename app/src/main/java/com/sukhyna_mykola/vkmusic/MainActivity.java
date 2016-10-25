@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MediaPlayer.OnPreparedListener {
     private String[] scope = new String[]{
             VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
-    ListView audioList;
+
     VKList<VKApiAudio> list;
     Button search;
     boolean logined;
@@ -74,10 +77,11 @@ public class MainActivity extends AppCompatActivity
     TextView nameMusic;
     TextView timeMusic;
     SharedPreferences sPref;
-    public static final String LOGINED="LOGINEG";
+    Fragment listFragment;
+    public static final String LOGINED = "LOGINEG";
 
     void saveText() {
-        sPref = getSharedPreferences("Mypref",MODE_PRIVATE);
+        sPref = getSharedPreferences("Mypref", MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putBoolean(LOGINED, logined);
         ed.commit();
@@ -85,10 +89,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     void loadText() {
-        sPref = getSharedPreferences("Mypref",MODE_PRIVATE);
+        sPref = getSharedPreferences("Mypref", MODE_PRIVATE);
         logined = sPref.getBoolean(LOGINED, false);
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +120,15 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        FragmentManager fm = getSupportFragmentManager();
+        listFragment = fm.findFragmentById(R.id.list_container);
+        if (listFragment == null) {
+            listFragment = new SoundListFragment();
+            fm.beginTransaction()
+                    .add(R.id.list_container, listFragment)
+                    .commit();
+        }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -149,24 +163,24 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-         loadText();
-        if(!logined){
-        VKSdk.login(this, scope);
-        logined = true;
+        loadText();
+        if (!logined) {
+            VKSdk.login(this, scope);
+            logined = true;
             saveText();
         }
         search = (Button) findViewById(R.id.search);
-        audioList = (ListView) findViewById(R.id.lv);
+
         textSearch = (EditText) findViewById(R.id.text_search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q, textSearch.getText(), VKApiConst.AUTO_COMPLETE, "1", VKApiConst.COUNT, 100));
+                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q, textSearch.getText(), VKApiConst.AUTO_COMPLETE, "1", VKApiConst.COUNT, 100,VKApiConst.SORT,0));
                 setListContent(request);
             }
         });
 
-        audioList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      /*  audioList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 releaseMP();
@@ -183,7 +197,7 @@ public class MainActivity extends AppCompatActivity
                 playBtn.setText("Pause");
             }
         });
-
+*/
         final Handler mHandler = new Handler();
 //Make sure you update Seekbar on UI thread
         MainActivity.this.runOnUiThread(new Runnable() {
@@ -245,8 +259,7 @@ public class MainActivity extends AppCompatActivity
                         super.onComplete(response);
                         VKList<VKApiUser> user = (VKList<VKApiUser>) response.parsedModel;
                         nav_user.setText(user.get(0).first_name + ' ' + user.get(0).last_name);
-                        new DownloadImageTask(image_user)
-                                .execute(user.get(0).photo_100);
+                        new DownloadImageTask(image_user).execute(user.get(0).photo_100);
                     }
                 });
 
@@ -281,12 +294,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_my_music) {
             final VKRequest request = VKApi.audio().get();
             setListContent(request);
-            // Handle the camera action
         } else if (id == R.id.nav_popular) {
-
             final VKRequest request = VKApi.audio().getPopular();
             setListContent(request);
-
         } else if (id == R.id.nav_recomend) {
             final VKRequest request = VKApi.audio().getRecommendations();
             setListContent(request);
@@ -306,15 +316,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                list = (VKList) response.parsedModel;
-                ArrayList<String> audioName = new ArrayList<String>();
-                for (VKApiAudio audio : list) {
-                    audioName.add(audio.title + " - " + audio.artist);
-
+                SoundLab soundLab = SoundLab.get(MainActivity.this);
+                ArrayList<Sound> sounds = new ArrayList<Sound>();
+                VKList<VKApiAudio> list = (VKList) response.parsedModel;
+                for (VKApiAudio audio:list) {
+                    sounds.add(new Sound(false,Constants.getTimeString(audio.duration*1000),audio.url,audio.title,audio.artist));
                 }
+                 soundLab.addAllSound(sounds);
+                ((SoundListFragment)listFragment).update();
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, audioName);
-                audioList.setAdapter(adapter);
             }
         });
     }
