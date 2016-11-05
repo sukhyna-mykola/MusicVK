@@ -5,47 +5,81 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-<RelativeLayout
-                android:id="@+id/item_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-    <ImageButton
-        android:id="@+id/play_pause_item_button"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/item_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:src="@android:drawable/ic_media_play"/>
+        android:layout_marginBottom="5dp"
+        android:background="@color/vk_share_gray_line"
+        android:gravity="center">
 
-    <ImageButton
-        android:id="@+id/menu_item_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:src="@android:drawable/ic_menu_more"/>
+        <ImageButton
+            android:layout_centerVertical="true"
+            android:id="@+id/play_pause_item_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@android:drawable/ic_media_play"/>
 
-    <TextView
-        android:id="@+id/title_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/play_pause_item_button"
-        android:maxLength="30"
-        android:maxLines="1"/>
+        <ImageButton
+            android:layout_centerVertical="true"
+            android:id="@+id/download_item_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/stat_sys_download"
+            />
 
-    <TextView
-        android:id="@+id/artist_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/duration_item_text"
-        android:layout_toRightOf="@+id/title_item_text"
-        android:maxLength="30"
-        android:maxLines="1"/>
+        <LinearLayout
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/duration_size_info"
+            android:layout_toRightOf="@+id/play_pause_item_button"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/duration_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/menu_item_button"/>
+            <TextView
+                android:id="@+id/title_item_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="sdfsdfddf"
+                android:textSize="18sp"/>
 
-</RelativeLayout>
-   </FrameLayout>
+            <TextView
+
+                android:id="@+id/artist_item_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="fdsfsdsfd"
+                android:textSize="12sp"/>
+        </LinearLayout>
+ <LinearLayout
+     android:id="@+id/duration_size_info"
+     android:layout_centerVertical="true"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_toLeftOf="@+id/download_item_button"
+     android:orientation="vertical">
+        <TextView
+            android:id="@+id/duration_item_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="16dp"
+            android:text="fsdfsdfsd"/>
+        <TextView
+            android:layout_below="@+id/duration_item_text"
+            android:id="@+id/size_item_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+           android:paddingRight="16dp"
+            android:text="fsdfsdfsd"/>
+ </LinearLayout>
+    </RelativeLayout>
+</FrameLayout>

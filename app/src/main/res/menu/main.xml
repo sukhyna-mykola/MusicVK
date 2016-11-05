@@ -1,9 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        android:id="@+id/action_search"
+        android:title="@android:string/search_go"
+        android:icon="@drawable/ic_ab_done"
+        yourapp:showAsAction="always|collapseActionView"
+        yourapp:actionViewClass="android.support.v7.widget.SearchView" />
+    <item
+        android:id="@+id/action_edit"
+        android:title="edit"
+        android:icon="@drawable/ic_ab_done"
+        yourapp:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_micro"
+        android:title="micro"
+        android:icon="@drawable/ic_ab_done"
+        yourapp:showAsAction="always" />
+    <item
+        android:id="@+id/action_remove"
+        android:title="remove"
+        android:icon="@drawable/ic_ab_done"
+        yourapp:showAsAction="always" />
+    <item
+        android:id="@+id/action_sort"
+        android:title="sort"
+        android:icon="@drawable/ic_ab_done"
+        yourapp:showAsAction="always" />
 </menu>

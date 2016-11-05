@@ -8,6 +8,7 @@ import com.vk.sdk.api.model.VKList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by mikola on 23.10.2016.
@@ -15,16 +16,7 @@ import java.util.List;
 
 public class SoundLab {
     public static SoundLab sSoundLab;
-    private List<Sound> mSounds;
-    private int curentPosition;
-
-    public int getCurentPosition() {
-        return curentPosition;
-    }
-
-    public void setCurentPosition(int curentPosition) {
-        this.curentPosition = curentPosition;
-    }
+    private  List<Sound> mSounds;
 
     public static SoundLab get(Context context) {
         if (sSoundLab == null)
@@ -42,6 +34,13 @@ public class SoundLab {
     public void addAllSound(ArrayList<Sound> newSounds){
         mSounds.clear();
         mSounds.addAll(newSounds);
+    }
+    public  Sound getSound(UUID id){
+        for (Sound sound:mSounds) {
+           if(sound.id.equals(id))
+               return sound;
+        }
+        return null;
     }
 
 }

@@ -8,12 +8,15 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -24,6 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,34 +55,39 @@ import com.vk.sdk.api.model.VKApiUser;
 import com.vk.sdk.api.model.VKList;
 import com.vk.sdk.util.VKUtil;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MediaPlayer.OnPreparedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MenuItemCompat.OnActionExpandListener {
     private String[] scope = new String[]{
             VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
 
-    VKList<VKApiAudio> list;
     Button search;
     boolean logined;
-    Button playBtn;
-    Button hideBtn;
-    SeekBar progresMusic;
-    MediaPlayer mediaPlayer;
     EditText textSearch;
     TextView nav_user;
     ImageView image_user;
-    FrameLayout playerControl;
-    TextView nameMusic;
-    TextView timeMusic;
+    String nameUser;
+    Bitmap photoUser;
+
     SharedPreferences sPref;
     Fragment listFragment;
+    User curUser;
     public static final String LOGINED = "LOGINEG";
 
     void saveText() {
@@ -95,26 +105,44 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+       /* fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (playerControl.getVisibility() == View.VISIBLE) {
-
-                    playerControl.setVisibility(View.GONE);
+                if (playerControl.getAlpha()==1) {
+                    fab.animate().scaleY(1f).setInterpolator(new LinearInterpolator()).start();
+                    fab.animate().scaleX(1f).setInterpolator(new LinearInterpolator()).start();
+                    fab.animate().translationY(0.0f).setInterpolator(new BounceInterpolator()).start();
+                    fab.animate().rotation(0).setInterpolator(new BounceInterpolator()).start();
+                   // playerControl.setVisibility(View.INVISIBLE);
+                    playerControl.animate().alpha(0).setInterpolator(new LinearInterpolator()).start();;
+                    playerControl.animate().translationY(playerControl.getHeight()).start();
                 } else {
-                    fab.hide();
-                    playerControl.setVisibility(View.VISIBLE);
+                    // fab.hide();
+                    playerControl.animate().alpha(1).setInterpolator(new LinearInterpolator()).start();;
+
+                    fab.animate().scaleY(0.75f).setInterpolator(new LinearInterpolator()).start();
+                    fab.animate().scaleX(0.75f).setInterpolator(new LinearInterpolator()).start();
+                    fab.animate().rotation(-180).setInterpolator(new LinearInterpolator()).start();
+                    fab.animate().translationY((float) (-(float) playerControl.getHeight() * 1.1)).start();
+                    playerControl.animate().translationY(0).start();
+                  //  playerControl.setVisibility(View.VISIBLE);
                 }
             }
         });
-
+*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -136,115 +164,37 @@ public class MainActivity extends AppCompatActivity
         View hView = navigationView.getHeaderView(0);
         nav_user = (TextView) hView.findViewById(R.id.name_user);
         image_user = (ImageView) hView.findViewById(R.id.imageView);
-        playerControl = (FrameLayout) findViewById(R.id.player_layout);
-        playBtn = (Button) findViewById(R.id.button_play);
-        progresMusic = (SeekBar) findViewById(R.id.seekBar);
-        hideBtn = (Button) findViewById(R.id.button_hide);
-        nameMusic = (TextView) findViewById(R.id.name_music);
-        timeMusic = (TextView) findViewById(R.id.time_music);
-        hideBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.show();
-                playerControl.setVisibility(View.GONE);
-            }
-        });
-        playBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mediaPlayer != null)
-                    if (mediaPlayer.isPlaying()) {
-                        playBtn.setText("Play");
-                        mediaPlayer.pause();
-                    } else {
-                        mediaPlayer.start();
-                        playBtn.setText("Pause");
-                    }
-            }
-        });
-
+       /*
+*/
         loadText();
+
         if (!logined) {
-            VKSdk.login(this, scope);
             logined = true;
             saveText();
+            VKSdk.login(this, scope);
+        } else {
+            File folder = new File(Environment.getExternalStorageDirectory() +
+                    File.separator + "VKMusicPlayer");
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
+            loadSerializedObject(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user"));
+
         }
+
         search = (Button) findViewById(R.id.search);
 
         textSearch = (EditText) findViewById(R.id.text_search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q, textSearch.getText(), VKApiConst.AUTO_COMPLETE, "1", VKApiConst.COUNT, 100,VKApiConst.SORT,0));
+                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q, textSearch.getText(), VKApiConst.AUTO_COMPLETE, "1", VKApiConst.COUNT, 100, VKApiConst.SORT, 0));
                 setListContent(request);
             }
         });
-
-      /*  audioList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                releaseMP();
-                mediaPlayer = new MediaPlayer();
-                try {
-                    mediaPlayer.setDataSource(list.get(position).url);
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.setOnPreparedListener(MainActivity.this);
-                    mediaPlayer.prepareAsync();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                nameMusic.setText(" " + list.get(position).title + " - " + list.get(position).artist + " ");
-                playBtn.setText("Pause");
-            }
-        });
-*/
-        final Handler mHandler = new Handler();
-//Make sure you update Seekbar on UI thread
-        MainActivity.this.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (mediaPlayer != null) {
-
-                    int mCurrentPosition = mediaPlayer.getCurrentPosition();
-
-                    progresMusic.setProgress(mCurrentPosition);
-                    timeMusic.setText(getTimeString(mediaPlayer.getCurrentPosition()) + " / " + getTimeString(mediaPlayer.getDuration()));
-                }
-                mHandler.postDelayed(this, 1000);
-            }
-        });
-        progresMusic.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (mediaPlayer != null && fromUser) {
-                    mediaPlayer.seekTo(progress);
-                }
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
     }
 
-    private void releaseMP() {
-        if (mediaPlayer != null) {
-            try {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -252,17 +202,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResult(VKAccessToken res) {
                 //якщо не вказано поле user_ids, то повертаэться поточний користувач
-                final VKRequest request = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "first_name,last_name,photo_100"));
-                request.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        VKList<VKApiUser> user = (VKList<VKApiUser>) response.parsedModel;
-                        nav_user.setText(user.get(0).first_name + ' ' + user.get(0).last_name);
-                        new DownloadImageTask(image_user).execute(user.get(0).photo_100);
-                    }
-                });
-
+                getInfo();
             }
 
             @Override
@@ -285,6 +225,21 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    void getInfo() {
+        final VKRequest request = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "first_name,last_name,photo_100"));
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                VKList<VKApiUser> user = (VKList<VKApiUser>) response.parsedModel;
+                nameUser = (user.get(0).first_name + ' ' + user.get(0).last_name);
+                nav_user.setText(nameUser);
+                new DownloadImageTask(image_user).execute(user.get(0).photo_100);
+            }
+        });
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -300,10 +255,13 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_recomend) {
             final VKRequest request = VKApi.audio().getRecommendations();
             setListContent(request);
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_update) {
+            getInfo();
 
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_exit) {
+            logined = false;
+            saveText();
+            System.exit(0);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -311,30 +269,45 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    ArrayList<Sound> sounds;
+
     private void setListContent(VKRequest request) {
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                SoundLab soundLab = SoundLab.get(MainActivity.this);
-                ArrayList<Sound> sounds = new ArrayList<Sound>();
+
+                sounds = null;
+                sounds = new ArrayList<Sound>();
                 VKList<VKApiAudio> list = (VKList) response.parsedModel;
-                for (VKApiAudio audio:list) {
-                    sounds.add(new Sound(false,Constants.getTimeString(audio.duration*1000),audio.url,audio.title,audio.artist));
+                for (VKApiAudio audio : list) {
+                    sounds.add(new Sound(false, (audio.duration * 1000), audio.url, audio.title, audio.artist));
                 }
-                 soundLab.addAllSound(sounds);
-                ((SoundListFragment)listFragment).update();
+                SoundLab.get(MainActivity.this).addAllSound(sounds);
+                ((SoundListFragment) listFragment).update();
+                new SizeFile().execute();
 
             }
         });
     }
 
 
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        mediaPlayer.start();
-        progresMusic.setMax(mediaPlayer.getDuration());
+    public String getSizeFileMB(int lenght) {
+        double fileSizeInMB = ((double) lenght / (1024.0 * 1024.0));
+        return String.valueOf(fileSizeInMB).substring(0, 4);
     }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        return false;
+    }
+
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
@@ -349,6 +322,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 InputStream in = new java.net.URL(urldisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
+
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();
@@ -358,24 +332,71 @@ public class MainActivity extends AppCompatActivity
 
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
+            photoUser = result;
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            photoUser.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            saveObject(new User(byteArray, nameUser, 0));
         }
     }
 
-    private String getTimeString(long millis) {
-        StringBuffer buf = new StringBuffer();
+    public void saveObject(User user) {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user"))); //Select where you wish to save the file...
+            oos.writeObject(user); // write the class as an 'object'
+            oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
+            oos.close();// close the stream
+        } catch (Exception ex) {
 
-        int hours = (int) (millis / (1000 * 60 * 60));
-        int minutes = (int) ((millis % (1000 * 60 * 60)) / (1000 * 60));
-        int seconds = (int) (((millis % (1000 * 60 * 60)) % (1000 * 60)) / 1000);
-
-        buf
-                .append(String.format("%02d", hours))
-                .append(":")
-                .append(String.format("%02d", minutes))
-                .append(":")
-                .append(String.format("%02d", seconds));
-
-        return buf.toString();
+        }
     }
 
+    public void loadSerializedObject(File f) {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+            curUser = (User) ois.readObject();
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable = true;
+            Bitmap bmp = BitmapFactory.decodeByteArray(curUser.getPhoto(), 0, curUser.getPhoto().length, options);
+            photoUser = bmp;
+
+            nameUser = curUser.getName();
+            nav_user.setText(nameUser);
+            image_user.setImageBitmap(photoUser);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    private class SizeFile extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... urlParams) {
+            URL url;
+            URLConnection conetion;
+            for (int i = 0; i < sounds.size(); i++)
+
+            {
+                try {
+                    url = new URL(sounds.get(i).getUrl());
+                    conetion = url.openConnection();
+                    conetion.connect();
+                    sounds.get(i).setSize(getSizeFileMB(conetion.getContentLength()));
+
+                } catch (Exception e) {
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void s) {
+            super.onPostExecute(s);
+            ((SoundListFragment) listFragment).update();
+        }
+
+
+    }
 }

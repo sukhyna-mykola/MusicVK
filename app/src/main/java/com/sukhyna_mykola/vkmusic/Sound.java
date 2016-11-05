@@ -1,67 +1,71 @@
 package com.sukhyna_mykola.vkmusic;
-
-import com.vk.sdk.api.model.VKApiAudio;
+import java.util.UUID;
 
 /**
  * Created by mikola on 24.10.2016.
  */
 
 public class Sound {
+    String size;
 
-    boolean state;
-    String duration;
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    boolean using;
+    boolean playing;
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    int duration;
     String url;
     String title;
     String artist;
+    UUID id;
 
 
-    public boolean isState() {
-        return state;
+    public boolean isUsing() {
+        return using;
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void setUsing(boolean using) {
+        this.using = using;
     }
 
     public String getUrl() {
         return url;
     }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getTitle() {
         return title;
     }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getArtist() {
         return artist;
     }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public int getDuration() {
+        return duration;
     }
 
-    public Sound(boolean state, String duration, String url, String title, String artist) {
+    public UUID getId() {
+        return id;
+    }
 
-        this.state = state;
+    public Sound(boolean using, int duration, String url, String title, String artist) {
+
+        this.using = using;
         this.duration = duration;
         this.url = url;
         this.title = title;
         this.artist = artist;
-    }
-
-    public String getDuration() {
-
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
+        id = UUID.randomUUID();
     }
 }

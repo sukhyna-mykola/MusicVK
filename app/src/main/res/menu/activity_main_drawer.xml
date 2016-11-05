@@ -20,13 +20,13 @@
     <item android:title="">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_update"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share"/>
+                android:title="@string/update"/>
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/nav_exit"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send"/>
+                android:title="@string/exit"/>
         </menu>
     </item>
 

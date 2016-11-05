@@ -1,11 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/vk_share_top_blue_color</item>
+        <item name="colorPrimaryDark">@color/vk_share_link_title_color</item>
+        <item name="colorAccent">@android:color/holo_blue_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,5 +16,14 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:textCursorDrawable">@drawable/ic_ab_done</item>
+        <item name="queryBackground">@android:color/transparent</item>
+        <item name="searchIcon">@drawable/ic_menu_send</item>
+        <item name="closeIcon">@drawable/vk_clear_shape</item>
+        <item name="queryHint">@string/navigation_drawer_close</item>
+        <item name="android:imeActionId">6</item>
+    </style>
 
 </resources>
