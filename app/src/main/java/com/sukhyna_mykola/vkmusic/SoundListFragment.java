@@ -30,6 +30,8 @@ import java.util.UUID;
 
 import static com.sukhyna_mykola.vkmusic.MusicService.INIT;
 import static com.sukhyna_mykola.vkmusic.MusicService.PARAM_NULL;
+import static com.sukhyna_mykola.vkmusic.MusicService.PARAM_PLAY_PAUSE;
+import static com.sukhyna_mykola.vkmusic.MusicService.PARAM_PLAY_SOUND_POSITION;
 import static com.sukhyna_mykola.vkmusic.MusicService.PARAM_POS;
 import static com.sukhyna_mykola.vkmusic.MusicService.PARAM_TYPE;
 import static com.sukhyna_mykola.vkmusic.MusicService.UPDATING;
@@ -44,13 +46,12 @@ public class SoundListFragment extends Fragment {
     private ListAdapter mAdapter;
     Intent musicIntent;
     BroadcastReceiver br;
-    private Intent playerIntent;
-
 
     public static final String IDSOUND = "idSound";
 
     private boolean isPlay;
-    private UUID curentID = UUID.randomUUID();
+    private int curentID = -1;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,8 +64,8 @@ public class SoundListFragment extends Fragment {
                     isPlay = intent.getBooleanExtra(MusicService.PARAM_PLAY, false);
                     update();
                 }
-                if(type == INIT){
-                    curentID = (UUID) intent.getSerializableExtra(MusicService.PARAM_POS);
+                if (type == INIT) {
+                    curentID = intent.getIntExtra(MusicService.PARAM_POS, curentID);
                 }
             }
         };
@@ -90,9 +91,9 @@ public class SoundListFragment extends Fragment {
             }
         });
         //якщо сервіс запущений отримати id поточної композиціїї
-        if(isMyServiceRunning(MusicService.class)){
+        if (isMyServiceRunning(MusicService.class)) {
             Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
-            intent.putExtra(PARAM_TYPE,PARAM_NULL);
+            intent.putExtra(PARAM_TYPE, PARAM_NULL);
             getActivity().sendBroadcast(intent);
         }
         updateUI();
@@ -110,10 +111,9 @@ public class SoundListFragment extends Fragment {
     public void update() {
         mAdapter.notifyDataSetChanged();
     }
-    public void update(int i) {
-        mAdapter.notifyItemChanged(i);
-    }
-    private class SoundHolder extends RecyclerView.ViewHolder {
+
+
+    private class SoundHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageButton mImageButtonPlayPause;
         ImageButton mDownload;
         TextView mTitle;
@@ -134,54 +134,33 @@ public class SoundListFragment extends Fragment {
             mDuration = (TextView) itemView.findViewById(R.id.duration_item_text);
             mSize = (TextView) itemView.findViewById(R.id.size_item_text);
 
-            mImageButtonPlayPause.setOnClickListener(new View.OnClickListener() {
+            v.setOnClickListener(this);
+            mImageButtonPlayPause.setOnClickListener(this);
+
+            mDownload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    if (!curentID.equals(mSound.getId())) {
-
-                        if (isMyServiceRunning(MusicService.class)) {
-                            getActivity().stopService(new Intent(getActivity(), MusicService.class));
-                            Log.d(TAG, "stop service");
-                        }
-                        startMusicService();
-                    } else {
-                        if (isMyServiceRunning(MusicService.class)) {
-                            if (!isPlay) {
-                                mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
-                                Log.d(TAG, "start service");
-                                Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
-                                intent.putExtra(MusicService.PARAM_TYPE, MusicService.PARAM_PLAY_PAUSE);
-                                getActivity().sendBroadcast(intent);
-                            } else {
-                                mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-                                Log.d(TAG, "pause service");
-                                Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
-                                intent.putExtra(MusicService.PARAM_TYPE, MusicService.PARAM_PLAY_PAUSE);
-                                getActivity().sendBroadcast(intent);
-                            }
-
-                        } else startMusicService();
-                    }
-
-                }
-            });
-           mDownload.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intentDownload = new Intent(getActivity(),DownloadService.class);
-                    intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD,mSound.getTitle()+"-"+mSound.getArtist());
-                    intentDownload.putExtra(DownloadService.URL_DOWNLOAD,mSound.getUrl());
+                    Intent intentDownload = new Intent(getActivity(), DownloadService.class);
+                    intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle() + "-" + mSound.getArtist());
+                    intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
                     getActivity().startService(intentDownload);
                 }
             });
 
         }
 
+
+
+        private Intent sendActionToService(String type) {
+            Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
+            intent.putExtra(MusicService.PARAM_TYPE, type);
+            return intent;
+        }
+
         private void startMusicService() {
             curentID = mSound.getId();
             for (Sound sound : SoundLab.get(getActivity()).getSounds()) {
-                if (!sound.id.equals(curentID)) {
+                if (sound.id != curentID) {
                     sound.setUsing(false);
                 }
             }
@@ -197,6 +176,32 @@ public class SoundListFragment extends Fragment {
             mSound = sound;
         }
 
+        @Override
+        public void onClick(View v) {
+            if (curentID != mSound.getId()) {
+                curentID = mSound.getId();
+                Intent intent = sendActionToService(PARAM_PLAY_SOUND_POSITION);
+                intent.putExtra(PARAM_POS, curentID);
+                getActivity().sendBroadcast(intent);
+            } else {
+                if (isMyServiceRunning(MusicService.class)) {
+                    if (!isPlay) {
+                        mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+                        Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
+                        getActivity().sendBroadcast(intent);
+                    } else {
+                        mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+                        Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
+                        getActivity().sendBroadcast(intent);
+                    }
+
+                } else {
+                    startMusicService();
+                    mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+                    v.setBackgroundColor(getResources().getColor(R.color.vk_light_color));
+                }
+            }
+        }
     }
 
     private class ListAdapter extends RecyclerView.Adapter<SoundHolder> {
@@ -222,9 +227,9 @@ public class SoundListFragment extends Fragment {
             holder.mTitle.setText(sound.title);
             holder.mArtist.setText(sound.artist);
             holder.mDuration.setText(Constants.getTimeString(sound.getDuration()));
-            if(sound.getSize()!=null)
-            holder.mSize.setText(sound.getSize()+"Mb.");
-            else  holder.mSize.setText("...");
+            if (sound.getSize() != null)
+                holder.mSize.setText(sound.getSize() + "Mb.");
+            else holder.mSize.setText("...");
 
 
             if (sound.isUsing()) {

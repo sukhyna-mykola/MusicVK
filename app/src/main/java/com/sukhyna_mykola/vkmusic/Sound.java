@@ -31,7 +31,7 @@ public class Sound {
     String url;
     String title;
     String artist;
-    UUID id;
+    int id;
 
 
     public boolean isUsing() {
@@ -55,17 +55,15 @@ public class Sound {
         return duration;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public Sound(boolean using, int duration, String url, String title, String artist) {
-
-        this.using = using;
+    public Sound(int duration, String url, String title, String artist,int id) {
         this.duration = duration;
         this.url = url;
         this.title = title;
         this.artist = artist;
-        id = UUID.randomUUID();
+        this.id = id;
     }
 }

@@ -1,7 +1,10 @@
 package com.sukhyna_mykola.vkmusic;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -10,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -17,7 +21,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -72,77 +81,130 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.sukhyna_mykola.vkmusic.Constants.PERFORMER_ONLY;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MenuItemCompat.OnActionExpandListener {
-    private String[] scope = new String[]{
-            VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
+    private String[] scope = new String[]{VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
 
-    Button search;
-    boolean logined;
-    EditText textSearch;
+
+
     TextView nav_user;
     ImageView image_user;
+
     String nameUser;
     Bitmap photoUser;
+
+
 
     SharedPreferences sPref;
     Fragment listFragment;
     User curUser;
-    public static final String LOGINED = "LOGINEG";
 
-    void saveText() {
-        sPref = getSharedPreferences("Mypref", MODE_PRIVATE);
+
+
+
+    void saveStatusLogined() {
+        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
-        ed.putBoolean(LOGINED, logined);
+        ed.putBoolean(SettingActivity.LOGINED_KEY, SettingActivity.logined);
         ed.commit();
 
     }
 
-    void loadText() {
-        sPref = getSharedPreferences("Mypref", MODE_PRIVATE);
-        logined = sPref.getBoolean(LOGINED, false);
+    void loadSetting() {
+        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
+        SettingActivity.sortType = sPref.getInt(SettingActivity.SORT_TYPE_KEY, 0);
+        SettingActivity.performerOnly = sPref.getInt(SettingActivity.PERFORMER_ONLY_KEY, 0);
+        SettingActivity.autoComplete = sPref.getInt(SettingActivity.AUTO_COMPLETE_KEY, 0);
+        SettingActivity.logined =  sPref.getBoolean(SettingActivity.LOGINED_KEY, false);
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+
+    private static final String[] SUGGESTIONS = {
+            "Король и шут", "любе", "под гитару",
+            "Bahia", "Mato Grosso", "Minas Gerais",
+            "Tocantins", "Rio Grande do Sul"};
+
+    private SearchView.OnQueryTextListener queryTextListener;
+     SearchView searchView;
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+            getMenuInflater().inflate(R.menu.menu, menu);
+            // Retrieve the SearchView and plug it into SearchManager
+            searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+
+            SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setSuggestionsAdapter(mAdapter);
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    populateAdapter(newText);
+                    return true;
+                }
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q,
+                            query, VKApiConst.AUTO_COMPLETE, SettingActivity.autoComplete,
+                            VKApiConst.COUNT, 100, VKApiConst.SORT, SettingActivity.sortType, PERFORMER_ONLY, SettingActivity.performerOnly));
+                    setListContent(request);
+                    return true;
+                }
+            });
+
+            searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+                @Override
+                public boolean onSuggestionClick(int position) {
+                   ;
+                    mAdapter.getCursor().moveToPosition(position);
+                    int id = mAdapter.getCursor().getColumnIndex(BaseColumns._ID);
+                    searchView.setQuery(SUGGESTIONS[mAdapter.getCursor().getInt(id)] ,true);
+                    return true;
+                }
+
+                @Override
+                public boolean onSuggestionSelect(int position) {
+                    return false;
+                }
+            });
+
+            return true;
+
     }
+    private void populateAdapter(String query) {
+
+        final MatrixCursor c = new MatrixCursor(new String[]{ BaseColumns._ID, "cityName" });
+        for (int i=0; i<SUGGESTIONS.length; i++) {
+            if (SUGGESTIONS[i].toLowerCase().startsWith(query.toLowerCase())){
+                c.addRow(new Object[] {i, SUGGESTIONS[i]});
+
+            }
+        }
+        mAdapter.changeCursor(c);
+    }
+
+
+    private SimpleCursorAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
+        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
 
-       /* fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (playerControl.getAlpha()==1) {
-                    fab.animate().scaleY(1f).setInterpolator(new LinearInterpolator()).start();
-                    fab.animate().scaleX(1f).setInterpolator(new LinearInterpolator()).start();
-                    fab.animate().translationY(0.0f).setInterpolator(new BounceInterpolator()).start();
-                    fab.animate().rotation(0).setInterpolator(new BounceInterpolator()).start();
-                   // playerControl.setVisibility(View.INVISIBLE);
-                    playerControl.animate().alpha(0).setInterpolator(new LinearInterpolator()).start();;
-                    playerControl.animate().translationY(playerControl.getHeight()).start();
-                } else {
-                    // fab.hide();
-                    playerControl.animate().alpha(1).setInterpolator(new LinearInterpolator()).start();;
-
-                    fab.animate().scaleY(0.75f).setInterpolator(new LinearInterpolator()).start();
-                    fab.animate().scaleX(0.75f).setInterpolator(new LinearInterpolator()).start();
-                    fab.animate().rotation(-180).setInterpolator(new LinearInterpolator()).start();
-                    fab.animate().translationY((float) (-(float) playerControl.getHeight() * 1.1)).start();
-                    playerControl.animate().translationY(0).start();
-                  //  playerControl.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-*/
+        final String[] from = new String[] {"cityName"};
+        final int[] to = new int[] {android.R.id.text1};
+        mAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                from,
+                to,
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -164,13 +226,11 @@ public class MainActivity extends AppCompatActivity
         View hView = navigationView.getHeaderView(0);
         nav_user = (TextView) hView.findViewById(R.id.name_user);
         image_user = (ImageView) hView.findViewById(R.id.imageView);
-       /*
-*/
-        loadText();
 
-        if (!logined) {
-            logined = true;
-            saveText();
+        loadSetting();
+        if (!SettingActivity.logined) {
+            SettingActivity.logined = true;
+            saveStatusLogined();
             VKSdk.login(this, scope);
         } else {
             File folder = new File(Environment.getExternalStorageDirectory() +
@@ -178,30 +238,23 @@ public class MainActivity extends AppCompatActivity
             if (!folder.exists()) {
                 folder.mkdirs();
             }
-
             loadSerializedObject(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user"));
-
         }
 
-        search = (Button) findViewById(R.id.search);
 
-        textSearch = (EditText) findViewById(R.id.text_search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q, textSearch.getText(), VKApiConst.AUTO_COMPLETE, "1", VKApiConst.COUNT, 100, VKApiConst.SORT, 0));
-                setListContent(request);
-            }
-        });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        searchView.setOnQueryTextListener(queryTextListener);
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                //якщо не вказано поле user_ids, то повертаэться поточний користувач
                 getInfo();
             }
 
@@ -257,11 +310,12 @@ public class MainActivity extends AppCompatActivity
             setListContent(request);
         } else if (id == R.id.nav_update) {
             getInfo();
-
         } else if (id == R.id.nav_exit) {
-            logined = false;
-            saveText();
+           SettingActivity.logined = false;
+            saveStatusLogined();
             System.exit(0);
+        } else if (id == R.id.nav_setting) {
+            startActivity(new Intent(this, SettingActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -281,7 +335,7 @@ public class MainActivity extends AppCompatActivity
                 sounds = new ArrayList<Sound>();
                 VKList<VKApiAudio> list = (VKList) response.parsedModel;
                 for (VKApiAudio audio : list) {
-                    sounds.add(new Sound(false, (audio.duration * 1000), audio.url, audio.title, audio.artist));
+                    sounds.add(new Sound((audio.duration * 1000), audio.url, audio.title, audio.artist, audio.id));
                 }
                 SoundLab.get(MainActivity.this).addAllSound(sounds);
                 ((SoundListFragment) listFragment).update();

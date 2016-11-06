@@ -71,7 +71,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
     private TextView endTime;
     private String time;
     private boolean isPlay;
-    UUID id;
+   int id;
     private Sound mSound;
     private int curentPos = -1;
 
@@ -86,7 +86,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        id = (UUID) getIntent().getSerializableExtra(SoundListFragment.IDSOUND);
+        id = getIntent().getIntExtra(SoundListFragment.IDSOUND,-1);
         Log.d(TAG, "id " + id);
         currentTime = (TextView) findViewById(R.id.player_cur_time);
         endTime = (TextView) findViewById(R.id.player_end_time);
@@ -141,7 +141,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
             }
         });
         for (int i = 0; i < mSounds.size(); i++) {
-            if (mSounds.get(i).getId().equals(id)) {
+            if (mSounds.get(i).getId()==(id)) {
                 pager.setCurrentItem(i);
                 break;
             }
@@ -171,8 +171,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 }
 
                 if (type == INIT) {
-                    UUID id = (UUID) intent.getSerializableExtra(MusicService.PARAM_POS);
-                    Log.d(TAG, "id " + id);
+                    int id =  intent.getIntExtra(MusicService.PARAM_POS,-1);
                     mSound = SoundLab.get(PlayerActivity.this).getSound(id);
                     curentPos = mSounds.indexOf(SoundLab.get(PlayerActivity.this).getSound(id));
                     progresMusic.setMax(mSound.getDuration());

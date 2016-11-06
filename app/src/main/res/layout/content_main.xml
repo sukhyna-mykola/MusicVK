@@ -14,31 +14,12 @@
     tools:context="com.sukhyna_mykola.vkmusic.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <LinearLayout
-        android:id="@+id/search_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true">
-
-        <Button
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search"/>
-
-        <EditText
-            android:id="@+id/text_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="введіть назву пісні"/>
-
-    </LinearLayout>
 
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/search_layout"
+
         android:id="@+id/list_container"
     />
 

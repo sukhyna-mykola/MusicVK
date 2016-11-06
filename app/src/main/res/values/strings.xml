@@ -11,5 +11,12 @@
     <string name="recomend">Рекомендовано</string>
     <string name="update">Оновити</string>
     <string name="exit">Вийти</string>
+    <string name="setting">Налаштування</string>
+    <string name="sort">Сортувати</string>
+    <string name="auto_complete">Автокорегування</string>
+    <string name="performer_only">Пошук тільки по виконавцю</string>
+    <string name="login">Увійти</string>
+    <string name="preferences">Mypref</string>
+
     <integer name="com_vk_sdk_AppId">5152034</integer>
 </resources>

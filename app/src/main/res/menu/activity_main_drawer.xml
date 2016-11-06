@@ -27,6 +27,10 @@
                 android:id="@+id/nav_exit"
                 android:icon="@drawable/ic_menu_send"
                 android:title="@string/exit"/>
+            <item
+                android:id="@+id/nav_setting"
+                android:icon="@drawable/ic_menu_send"
+                android:title="@string/setting"/>
         </menu>
     </item>
 

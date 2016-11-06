@@ -39,18 +39,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     PendingIntent pendingIntent;
     PendingIntent ppreviousIntent;
     PendingIntent pcloseIntent;
+
     private int position;
     private SoundLab mSoundLab;
+    UpdateInfo threadUpdating;
 
-
-    private Sound curentSound;
-
+    private Sound currentSound;
 
     private RemoteViews notificationView;
     private Intent intentPlayer;
+
     private boolean randomPos;
     private boolean repeatPos;
-    private UpdateInfo threadUpdating;
+
     Context mContext;
 
     public final static String PARAM_TYPE = "com.sukhyna_mykola.vkmusic.play_play.PARAM_TYPE";
@@ -68,7 +69,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public final static String PARAM_SEEK_TO = "com.sukhyna_mykola.vkmusic.play_play.PARAM_SEEK_TO";
     public final static String PARAM_LOOP = "com.sukhyna_mykola.vkmusic.play_play.PARAM_LOOP";
     public final static String PARAM_RAND = "com.sukhyna_mykola.vkmusic.play_play.PARAM_RAND";
-
+    public final static String PARAM_PLAY_SOUND_POSITION = "com.sukhyna_mykola.vkmusic.play_play.PARAM_PLAY_SOUND_POSITION";
 
     public final static String PARAM_PROGRESS = "com.sukhyna_mykola.vkmusic.PARAM_PROGRESS ";
     public static final String PARAM_PLAY = "com.sukhyna_mykola.vkmusic.PARAM_PLAY";
@@ -104,7 +105,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     prevSound();
                 }
                 if (type.equals(PARAM_NULL)) {
-                    Toast.makeText((mContext), curentSound.getTitle(), Toast.LENGTH_LONG).show();
+                    Toast.makeText((mContext), currentSound.getTitle(), Toast.LENGTH_LONG).show();
 
                 }
                 if (type.equals(PARAM_SEEK_TO)) {
@@ -119,6 +120,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 if (type.equals(PARAM_RAND)) {
                     randomPos = !randomPos;
                     sendLoopRand();
+                }
+                if (type.equals(PARAM_PLAY_SOUND_POSITION)) {
+                    int newID =  intent.getIntExtra(PARAM_POS,-1);
+                    int newPosition = mSoundLab.getSounds().indexOf(mSoundLab.getSound(newID));
+                    playSoundPosition(newPosition);
                 }
                 updateNotification();
                 sendPos();
@@ -136,12 +142,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
 
             if (position != -1)
-                curentSound.setUsing(false);
+                currentSound.setUsing(false);
 
-            curentSound = SoundLab.get(this).getSound((UUID) intent.getExtras().getSerializable(PARAM_POS));
-            curentSound.setUsing(true);
-            position = mSoundLab.getSounds().indexOf(curentSound);
-            initPlayer(curentSound.url);
+            currentSound = SoundLab.get(this).getSound(intent.getIntExtra(PARAM_POS,-1));
+            currentSound.setUsing(true);
+            position = mSoundLab.getSounds().indexOf(currentSound);
+            initPlayer(currentSound.url);
 
             Log.i(TAG, "Received Start Foreground Intent ");
 
@@ -194,7 +200,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             Log.i(TAG, "Clicked Next");
         } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             Log.i(TAG, "Received Stop Foreground Intent");
-            curentSound.setUsing(false);
+            currentSound.setUsing(false);
             stopForeground(true);
             stopSelf();
         }
@@ -217,8 +223,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
 
         // Locate and set the Text into customnotificationtext.xml TextViews
-        notificationView.setTextViewText(R.id.status_bar_track_name, curentSound.title);
-        notificationView.setTextViewText(R.id.status_bar_artist_name, curentSound.artist);
+        notificationView.setTextViewText(R.id.status_bar_track_name, currentSound.title);
+        notificationView.setTextViewText(R.id.status_bar_artist_name, currentSound.artist);
         notificationView.setImageViewResource(R.id.status_bar_collapse, android.R.drawable.ic_menu_close_clear_cancel);
 
         notificationView.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
@@ -233,7 +239,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     protected NotificationCompat.Builder buildNotification() {
 
         Intent notificationIntent = new Intent(this, PlayerActivity.class);
-        notificationIntent.putExtra(IDSOUND, curentSound.getId());
+        notificationIntent.putExtra(IDSOUND, currentSound.getId());
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -249,8 +255,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             builder = builder.setCustomBigContentView(getComplexNotificationView());
         } else {
-            builder = builder.setContentTitle(curentSound.title)
-                    .setContentText(curentSound.artist)
+            builder = builder.setContentTitle(currentSound.title)
+                    .setContentText(currentSound.artist)
                     .setSmallIcon(android.R.drawable.ic_menu_gallery);
         }
         return builder;
@@ -284,7 +290,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }
             mediaPlayer.release();
         }
-        curentSound.setUsing(false);
+        currentSound.setUsing(false);
         unregisterReceiver(br);
     }
 
@@ -314,7 +320,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void sendPos() {
         intentPlayer = new Intent(DATA_FROM_SERVICE);
         intentPlayer.putExtra(PARAM_TYPE, INIT);
-        intentPlayer.putExtra(PARAM_POS, curentSound.getId());
+        intentPlayer.putExtra(PARAM_POS, currentSound.getId());
         sendBroadcast(intentPlayer);
     }
 
@@ -326,7 +332,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaPlayer.start();
         updateNotification();
         threadUpdating = new UpdateInfo();
-        Toast.makeText(this, curentSound.title, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, currentSound.title, Toast.LENGTH_SHORT).show();
     }
 
     //викликається коли файл завершив програвання
@@ -338,44 +344,55 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private void nextSound() {
         if (!repeatPos) {
-            curentSound.setUsing(false);
+            currentSound.setUsing(false);
 
             if (randomPos)
                 position = new Random().nextInt(mSoundLab.getSounds().size());
             else position++;
 
             if (position < mSoundLab.getSounds().size()) {
-                initCurentSound(position);
+                initcurrentSound(position);
             } else {
                 position = mSoundLab.getSounds().size() - 1;
-                initCurentSound(position);
+                initcurrentSound(position);
             }
             sendPos();
         }
     }
 
 
-    private void initCurentSound(int pos) {
+    private void initcurrentSound(int pos) {
         mediaPlayer.reset();
-        curentSound = mSoundLab.getSounds().get(pos);
-        curentSound.setUsing(true);
-        initPlayer(curentSound.url);
+        currentSound = mSoundLab.getSounds().get(pos);
+        currentSound.setUsing(true);
+        initPlayer(currentSound.url);
+    }
+
+    private void playSoundPosition(int newPosition) {
+        position = newPosition;
+        currentSound.setUsing(false);
+        if (position > 0 && position < mSoundLab.getSounds().size()) {
+            initcurrentSound(position);
+        } else {
+            position = 0;
+            initcurrentSound(position);
+        }
+        sendPos();
     }
 
     private void prevSound() {
-        if(!repeatPos)
-        {
-            curentSound.setUsing(false);
+        if (!repeatPos) {
+            currentSound.setUsing(false);
 
             if (randomPos)
                 position = new Random().nextInt(mSoundLab.getSounds().size());
             else position--;
 
             if (position > 0) {
-                initCurentSound(position);
+                initcurrentSound(position);
             } else {
                 position = 0;
-                initCurentSound(position);
+                initcurrentSound(position);
             }
             sendPos();
         }
@@ -393,7 +410,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         @Override
         public void run() {
-            while (curentSound.isUsing()) {
+            while (currentSound.isUsing()) {
                 try {
                     sendUpdate();
                 } catch (Exception e) {

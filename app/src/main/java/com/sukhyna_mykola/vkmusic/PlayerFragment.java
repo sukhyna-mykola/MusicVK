@@ -34,7 +34,7 @@ public class PlayerFragment extends Fragment {
     TextView timeMusic;
     SeekBar progresMusic;
 
-    UUID id;
+    int  id;
 
     public static final String ARG_ID_SOUND = "com.sukhyna_mykola.vkmusic.ARG_ID_SOUND";
 
@@ -42,10 +42,10 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        id = (UUID) getArguments().getSerializable(ARG_ID_SOUND);
+        id =  getArguments().getInt(ARG_ID_SOUND);
         }
 
-    static PlayerFragment newInstance(UUID id) {
+    static PlayerFragment newInstance(int id) {
         PlayerFragment pageFragment = new PlayerFragment();
         Bundle arguments = new Bundle();
         arguments.putSerializable(ARG_ID_SOUND, id);

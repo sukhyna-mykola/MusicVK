@@ -5,9 +5,7 @@ package com.sukhyna_mykola.vkmusic;
  */
 
 public class Constants {
-    public static final String TITLE="title";
-    public static final String IMAGE ="img";
-    public static final String DECK="description";
+    public static final String PERFORMER_ONLY = "performer_only";
     public interface ACTION {
         public static String MAIN_ACTION = "com.truiton.foregroundservice.action.main";
         public static String PREV_ACTION = "com.truiton.foregroundservice.action.prev";

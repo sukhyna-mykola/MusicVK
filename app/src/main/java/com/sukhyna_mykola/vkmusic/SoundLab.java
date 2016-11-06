@@ -35,9 +35,9 @@ public class SoundLab {
         mSounds.clear();
         mSounds.addAll(newSounds);
     }
-    public  Sound getSound(UUID id){
+    public  Sound getSound(int id){
         for (Sound sound:mSounds) {
-           if(sound.id.equals(id))
+           if(sound.id==id)
                return sound;
         }
         return null;

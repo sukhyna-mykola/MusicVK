@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -9,31 +9,30 @@
         android:id="@+id/item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:background="@color/vk_share_gray_line"
         android:gravity="center">
 
         <ImageButton
-            android:layout_centerVertical="true"
             android:id="@+id/play_pause_item_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:src="@android:drawable/ic_media_play"/>
 
         <ImageButton
-            android:layout_centerVertical="true"
             android:id="@+id/download_item_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:src="@android:drawable/stat_sys_download"
             />
 
         <LinearLayout
-            android:layout_centerVertical="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/duration_size_info"
             android:layout_toRightOf="@+id/play_pause_item_button"
             android:orientation="vertical">
@@ -45,7 +44,7 @@
                 android:layout_centerVertical="true"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="sdfsdfddf"
+
                 android:textSize="18sp"/>
 
             <TextView
@@ -56,30 +55,33 @@
                 android:layout_centerVertical="true"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="fdsfsdsfd"
+
                 android:textSize="12sp"/>
         </LinearLayout>
- <LinearLayout
-     android:id="@+id/duration_size_info"
-     android:layout_centerVertical="true"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_toLeftOf="@+id/download_item_button"
-     android:orientation="vertical">
-        <TextView
-            android:id="@+id/duration_item_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="16dp"
-            android:text="fsdfsdfsd"/>
-        <TextView
-            android:layout_below="@+id/duration_item_text"
-            android:id="@+id/size_item_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
 
-           android:paddingRight="16dp"
-            android:text="fsdfsdfsd"/>
- </LinearLayout>
+        <LinearLayout
+            android:id="@+id/duration_size_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/download_item_button"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/duration_item_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="16dp"
+                />
+
+            <TextView
+                android:id="@+id/size_item_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/duration_item_text"
+
+                android:paddingRight="16dp"
+                />
+        </LinearLayout>
     </RelativeLayout>
-</FrameLayout>
+</android.support.v7.widget.CardView>
