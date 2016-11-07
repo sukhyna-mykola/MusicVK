@@ -2,59 +2,61 @@ package com.sukhyna_mykola.vkmusic;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class SettingActivity extends AppCompatActivity  {
+public class SettingActivity extends AppCompatActivity  implements View.OnClickListener{
     Spinner mSpinnerSort;
-    CheckBox mCheckBoxAutoComplete;
-    CheckBox mCheckBoxPerformerOnly;
+    SwitchCompat mSwitchAutoComplete;
+    SwitchCompat mSwitchPerformerOnly;
 
     public static final String SORT_TYPE_KEY = "SORT_TYPE_KEY";
     public static final String AUTO_COMPLETE_KEY = "AUTO_COMPLETE_KEY";
     public static final String PERFORMER_ONLY_KEY = "PERFORMER_ONLY_KEY";
     public static final String LOGINED_KEY = "LOGINED_KEY";
 
-
-    public static final String POPULAR = "POPULAR";
-    public static final String LENGHT = "LENGHT";
-    public static final String DATE = "DATE";
-    String[] dataSort = {DATE, LENGHT, POPULAR};
+    String[] dataSort ;
 
 
     public static int autoComplete;
     public static int performerOnly;
     public static int sortType;
     public static  boolean logined;
+    public static  boolean isLooping;
+    public static  boolean isRandom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-
-
-        mCheckBoxAutoComplete = (CheckBox) findViewById(R.id.сheck_auto_complete);
-        mCheckBoxPerformerOnly = (CheckBox) findViewById(R.id.сheck_performer_only);
+        getSupportActionBar().setTitle(R.string.setting);
+        dataSort = getResources().getStringArray(R.array.list_of_type_sort);
+        mSwitchAutoComplete = (SwitchCompat) findViewById(R.id.switch_auto_complete);
+        mSwitchPerformerOnly = (SwitchCompat) findViewById(R.id.switch_performer_only);
         // адаптер
         if (autoComplete == 1)
-            mCheckBoxAutoComplete.setChecked(true);
-        else mCheckBoxAutoComplete.setChecked(false);
+            mSwitchAutoComplete.setChecked(true);
+        else mSwitchAutoComplete.setChecked(false);
         if (performerOnly == 1)
-            mCheckBoxPerformerOnly.setChecked(true);
+            mSwitchPerformerOnly.setChecked(true);
         else
-            mCheckBoxPerformerOnly.setChecked(false);
+            mSwitchPerformerOnly.setChecked(false);
 
 
-        mCheckBoxPerformerOnly.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mSwitchPerformerOnly.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -65,7 +67,7 @@ public class SettingActivity extends AppCompatActivity  {
 
             }
         });
-        mCheckBoxAutoComplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mSwitchAutoComplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -85,6 +87,7 @@ public class SettingActivity extends AppCompatActivity  {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 sortType = position;
+                Snackbar.make(view,getResources().getString(R.string.sort_by)+": " +dataSort[sortType],Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -115,4 +118,11 @@ public class SettingActivity extends AppCompatActivity  {
     }
 
 
+    @Override
+    public void onClick(View v) {
+        MainActivity.soundHelp.clear();
+        SQLiteDatabase db = new DBHelper(SettingActivity.this).getWritableDatabase();
+        db.delete(Constants.TABLE_NAME,null,null);
+        Snackbar.make(v, R.string.cleared_histoty,Snackbar.LENGTH_SHORT).show();
+    }
 }

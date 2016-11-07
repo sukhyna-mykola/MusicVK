@@ -3,14 +3,16 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp">
 
     <RelativeLayout
         android:id="@+id/item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/vk_share_gray_line"
-        android:gravity="center">
+        android:gravity="center"
+        android:padding="5dp">
 
         <ImageButton
             android:id="@+id/play_pause_item_button"
@@ -18,6 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/selector_btn"
             android:src="@android:drawable/ic_media_play"/>
 
         <ImageButton
@@ -26,7 +30,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@android:drawable/stat_sys_download"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_btn_rect"
+            android:src="@drawable/ic_file_download_black_24dp"
             />
 
         <LinearLayout

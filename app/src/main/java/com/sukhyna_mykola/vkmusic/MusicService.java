@@ -41,7 +41,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     PendingIntent pcloseIntent;
 
     private int position;
-    private SoundLab mSoundLab;
+
     UpdateInfo threadUpdating;
 
     private Sound currentSound;
@@ -81,13 +81,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onCreate() {
         position = -1;
-        mSoundLab = SoundLab.get(this);
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnCompletionListener(this);
         mContext = this;
-        Log.d(TAG, "mSoundLab.size = " + mSoundLab.getSounds().size());
-        Log.d(TAG, "onCreate");
+        randomPos = SettingActivity.isRandom;
+        repeatPos = SettingActivity.isLooping;
+        mediaPlayer.setLooping(repeatPos);
+
         br = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -105,7 +107,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     prevSound();
                 }
                 if (type.equals(PARAM_NULL)) {
-                    Toast.makeText((mContext), currentSound.getTitle(), Toast.LENGTH_LONG).show();
+
 
                 }
                 if (type.equals(PARAM_SEEK_TO)) {
@@ -115,15 +117,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 if (type.equals(PARAM_LOOP)) {
                     repeatPos = !repeatPos;
                     mediaPlayer.setLooping(repeatPos);
-                    sendLoopRand();
                 }
                 if (type.equals(PARAM_RAND)) {
                     randomPos = !randomPos;
-                    sendLoopRand();
                 }
                 if (type.equals(PARAM_PLAY_SOUND_POSITION)) {
                     int newID =  intent.getIntExtra(PARAM_POS,-1);
-                    int newPosition = mSoundLab.getSounds().indexOf(mSoundLab.getSound(newID));
+                    int newPosition = SoundLab.get().getCurentPlayList().indexOf(SoundLab.get().getSound(newID));
                     playSoundPosition(newPosition);
                 }
                 updateNotification();
@@ -144,9 +144,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             if (position != -1)
                 currentSound.setUsing(false);
 
-            currentSound = SoundLab.get(this).getSound(intent.getIntExtra(PARAM_POS,-1));
+            currentSound = SoundLab.get().getSound(intent.getIntExtra(PARAM_POS,-1));
             currentSound.setUsing(true);
-            position = mSoundLab.getSounds().indexOf(currentSound);
+
+            position =  SoundLab.get().getCurentPlayList().indexOf(currentSound);
             initPlayer(currentSound.url);
 
             Log.i(TAG, "Received Start Foreground Intent ");
@@ -309,13 +310,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         sendBroadcast(intentPlayer);
     }
 
-    private void sendLoopRand() {
-        intentPlayer = new Intent(DATA_FROM_SERVICE);
-        intentPlayer.putExtra(PARAM_TYPE, LOOPRAND);
-        intentPlayer.putExtra(PARAM_RAND, randomPos);
-        intentPlayer.putExtra(PARAM_LOOP, repeatPos);
-        sendBroadcast(intentPlayer);
-    }
+
 
     private void sendPos() {
         intentPlayer = new Intent(DATA_FROM_SERVICE);
@@ -332,7 +327,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaPlayer.start();
         updateNotification();
         threadUpdating = new UpdateInfo();
-        Toast.makeText(this, currentSound.title, Toast.LENGTH_SHORT).show();
     }
 
     //викликається коли файл завершив програвання
@@ -347,13 +341,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             currentSound.setUsing(false);
 
             if (randomPos)
-                position = new Random().nextInt(mSoundLab.getSounds().size());
+                position = new Random().nextInt(SoundLab.get().getCurentPlayList().size());
             else position++;
 
-            if (position < mSoundLab.getSounds().size()) {
+            if (position < SoundLab.get().getCurentPlayList().size()) {
                 initcurrentSound(position);
             } else {
-                position = mSoundLab.getSounds().size() - 1;
+                position = SoundLab.get().getCurentPlayList().size() - 1;
                 initcurrentSound(position);
             }
             sendPos();
@@ -363,7 +357,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private void initcurrentSound(int pos) {
         mediaPlayer.reset();
-        currentSound = mSoundLab.getSounds().get(pos);
+        currentSound = SoundLab.get().getCurentPlayList().get(pos);
         currentSound.setUsing(true);
         initPlayer(currentSound.url);
     }
@@ -371,7 +365,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void playSoundPosition(int newPosition) {
         position = newPosition;
         currentSound.setUsing(false);
-        if (position > 0 && position < mSoundLab.getSounds().size()) {
+        if (position > 0 && position < SoundLab.get().getCurentPlayList().size()) {
             initcurrentSound(position);
         } else {
             position = 0;
@@ -385,7 +379,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             currentSound.setUsing(false);
 
             if (randomPos)
-                position = new Random().nextInt(mSoundLab.getSounds().size());
+                position = new Random().nextInt(SoundLab.get().getCurentPlayList().size());
             else position--;
 
             if (position > 0) {
@@ -403,7 +397,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         public UpdateInfo() {
 
-            thread = new Thread(this, "Поток для примера");
+            thread = new Thread(this);
             thread.start();
 
         }

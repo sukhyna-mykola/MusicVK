@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/menu_top_group">
         <item
             android:id="@+id/nav_my_music"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_library_books_black_24dp"
             android:title="@string/my_music"/>
         <item
             android:id="@+id/nav_popular"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_library_music_black_24dp"
             android:title="@string/popular"/>
         <item
             android:id="@+id/nav_recomend"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_queue_play_next_black_24dp"
             android:title="@string/recomend"/>
+
 
     </group>
 
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_update"
-                android:icon="@drawable/ic_menu_share"
-                android:title="@string/update"/>
-            <item
-                android:id="@+id/nav_exit"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/exit"/>
+    <group
+        android:id="@+id/menu_sett_group"
+        android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_setting"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/ic_settings_black_24dp"
                 android:title="@string/setting"/>
-        </menu>
-    </item>
+          >
+
+
+    </group>
+    <group
+        android:id="@+id/menu_exit_group"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/ic_reply_black_24dp"
+            android:title="@string/exit"/>
+
+
+    </group>
 
 </menu>

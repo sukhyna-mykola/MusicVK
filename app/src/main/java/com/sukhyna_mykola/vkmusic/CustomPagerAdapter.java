@@ -19,7 +19,7 @@ class CustomPagerAdapter extends PagerAdapter {
     public CustomPagerAdapter(Context context) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(mContext);
-        pages = (ArrayList<Sound>) SoundLab.get(mContext).getSounds();
+        pages = (ArrayList<Sound>) SoundLab.get().getSounds();
     }
 
     // Returns the number of pages to be displayed in the ViewPager.
@@ -40,7 +40,7 @@ class CustomPagerAdapter extends PagerAdapter {
         // Inflate the layout for the page
         View v = mLayoutInflater.inflate(R.layout.player_fragment, container, false);
         // Find and populate data into the page (i.e set the image)
-        Sound sound = SoundLab.get(mContext).getSounds().get(position);
+        Sound sound = SoundLab.get().getSounds().get(position);
         ( (TextView)v.findViewById(R.id.title_sound_player)).setText(sound.getTitle());
         ( (TextView)v.findViewById(R.id.artist_sound_player)).setText(sound.getArtist());
         container.addView(v);

@@ -5,6 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by mikola on 05.11.2016.
@@ -12,6 +14,9 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     byte[] photo;
+
+
+
     String name;
     int id;
 

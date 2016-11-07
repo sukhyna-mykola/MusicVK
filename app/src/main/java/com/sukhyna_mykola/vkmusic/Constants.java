@@ -6,6 +6,8 @@ package com.sukhyna_mykola.vkmusic;
 
 public class Constants {
     public static final String PERFORMER_ONLY = "performer_only";
+    public final static String DB_NAME= "db_sounds_help";
+    public final static String TABLE_NAME= "table_sounds";
     public interface ACTION {
         public static String MAIN_ACTION = "com.truiton.foregroundservice.action.main";
         public static String PREV_ACTION = "com.truiton.foregroundservice.action.prev";

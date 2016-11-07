@@ -15,13 +15,25 @@
     tools:showIn="@layout/app_bar_main">
 
 
-
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
 
         android:id="@+id/list_container"
-    />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/container_hint"
+            android:drawableBottom="@drawable/ic_active_search"
+            android:typeface="serif"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:text="@string/input_search_query"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
 
 
 </RelativeLayout>

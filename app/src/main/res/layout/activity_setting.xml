@@ -36,14 +36,20 @@
                         style="?android:listSeparatorTextViewStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:text="@string/sort"/>
+
+                        android:layout_margin="16dp"
+
+                        android:text="@string/sort_by"/>
 
                     <Spinner
                         android:id="@+id/spinner_sort"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp">
+
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:paddingBottom="16dp"
+                        >
                     </Spinner>
 
 
@@ -54,6 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/top_catd_view"
+                android:layout_marginTop="16dp"
                 android:padding="16dp">
 
                 <RelativeLayout
@@ -62,8 +69,8 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <CheckBox
-                        android:id="@+id/сheck_auto_complete"
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/switch_auto_complete"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"/>
@@ -72,7 +79,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/сheck_auto_complete"
+                        android:layout_toRightOf="@+id/switch_auto_complete"
+                        android:paddingLeft="16dp"
                         android:text="@string/auto_complete"/>
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
@@ -81,6 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/top_catd_view"
+                android:layout_marginTop="16dp"
                 android:padding="16dp">
 
                 <RelativeLayout
@@ -88,8 +97,8 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp">
 
-                    <CheckBox
-                        android:id="@+id/сheck_performer_only"
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/switch_performer_only"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"/>
@@ -98,11 +107,38 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/сheck_performer_only"
+                        android:layout_toRightOf="@+id/switch_performer_only"
+                        android:paddingLeft="16dp"
                         android:text="@string/performer_only"/>
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
 
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/top_catd_view"
+                android:layout_marginTop="16dp"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+
+                    <Button
+                        android:id="@+id/btn_clear_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/selector_btn_rect"
+                        android:drawableLeft="@drawable/ic_delete_black_24dp"
+                        android:gravity="center"
+                        android:onClick="onClick"
+                        android:text="@string/clear_history"/>
+
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

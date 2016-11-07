@@ -44,15 +44,19 @@
             android:layout_height="wrap_content">
 
             <ImageButton
+                android:background="@drawable/selector_btn"
                 android:onClick="onClick"
                 android:id="@+id/player_button_play_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:src="@drawable/ic_play_arrow_black_24dp"/>
 
             <ImageButton
+                android:background="@drawable/selector_btn"
                 android:onClick="onClick"
                 android:id="@+id/player_next_sound"
                 android:layout_width="wrap_content"
@@ -63,6 +67,7 @@
                 android:src="@drawable/ic_skip_next_black_24dp"/>
 
             <ImageButton
+                android:background="@drawable/selector_btn"
                 android:onClick="onClick"
                 android:id="@+id/player_prev_sound"
                 android:layout_width="wrap_content"
@@ -73,6 +78,7 @@
                 android:src="@drawable/ic_skip_previous_black_24dp"/>
 
             <ImageButton
+                android:background="@drawable/background_btn_none"
                 android:onClick="onClick"
                 android:id="@+id/player_shuffle"
                 android:layout_width="wrap_content"
@@ -81,6 +87,7 @@
                 android:src="@drawable/ic_shuffle_black_24dp"/>
 
             <ImageButton
+                android:background="@drawable/background_btn_none"
                 android:onClick="onClick"
                 android:id="@+id/player_repeat_one"
                 android:layout_width="wrap_content"
@@ -104,6 +111,7 @@
     </android.support.v4.view.ViewPager>
 
     <ImageButton
+        android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
         android:id="@+id/player_list_sounds_btn"
         android:layout_width="wrap_content"
@@ -112,4 +120,15 @@
         android:layout_alignParentTop="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_queue_music_black_24dp"/>
+    <ImageButton
+        android:visibility="gone"
+        android:background="@drawable/background_btn_none"
+        android:onClick="onClick"
+        android:id="@+id/like_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:src="@mipmap/ic_like_false"/>
 </RelativeLayout>

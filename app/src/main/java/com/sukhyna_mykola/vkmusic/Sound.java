@@ -1,11 +1,12 @@
 package com.sukhyna_mykola.vkmusic;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * Created by mikola on 24.10.2016.
  */
 
-public class Sound {
+public class Sound implements Serializable{
     String size;
 
     public String getSize() {

@@ -73,7 +73,7 @@ public class PlayerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.player_fragment, container, false);
-        Sound sound = SoundLab.get(getActivity()).getSound(id);
+        Sound sound = SoundLab.get().getSound(id);
         ( (TextView)v.findViewById(R.id.title_sound_player)).setText(sound.getTitle());
         ( (TextView)v.findViewById(R.id.artist_sound_player)).setText(sound.getArtist());
         return v;

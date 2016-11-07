@@ -52,7 +52,7 @@ public class DownloadService extends Service {
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setContentTitle(title)
-                .setContentText("завантаження . . .")
+                .setContentText(getString(R.string.downloading))
                 .setSmallIcon(android.R.drawable.stat_sys_download);
 
         new Thread(
@@ -74,7 +74,7 @@ public class DownloadService extends Service {
                             }
                         }
 
-                        mBuilder.setContentText("Завантаження завершене")
+                        mBuilder.setContentText(getString(R.string.downloading_ended))
 
                                 .setProgress(0,0,false);
                         mNotifyManager.notify(notificationID, mBuilder.build());

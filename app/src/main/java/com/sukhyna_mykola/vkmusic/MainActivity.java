@@ -1,10 +1,14 @@
 package com.sukhyna_mykola.vkmusic;
 
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -36,6 +40,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
@@ -80,6 +85,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 import static com.sukhyna_mykola.vkmusic.Constants.PERFORMER_ONLY;
 
@@ -87,21 +96,18 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MenuItemCompat.OnActionExpandListener {
     private String[] scope = new String[]{VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
 
-
-
+    ContentValues cv = new ContentValues();
+    DBHelper dbHelper;
     TextView nav_user;
     ImageView image_user;
-
+    public static HashSet<String> soundHelp = new HashSet<>();
     String nameUser;
     Bitmap photoUser;
-
-
+    TextView containerHint;
 
     SharedPreferences sPref;
     Fragment listFragment;
     User curUser;
-
-
 
 
     void saveStatusLogined() {
@@ -113,72 +119,92 @@ public class MainActivity extends AppCompatActivity
     }
 
     void loadSetting() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         SettingActivity.sortType = sPref.getInt(SettingActivity.SORT_TYPE_KEY, 0);
         SettingActivity.performerOnly = sPref.getInt(SettingActivity.PERFORMER_ONLY_KEY, 0);
         SettingActivity.autoComplete = sPref.getInt(SettingActivity.AUTO_COMPLETE_KEY, 0);
-        SettingActivity.logined =  sPref.getBoolean(SettingActivity.LOGINED_KEY, false);
+        SettingActivity.logined = sPref.getBoolean(SettingActivity.LOGINED_KEY, false);
 
+        Cursor c = db.query(Constants.TABLE_NAME, null, null, null, null, null, null);
+
+        if (c.moveToFirst()) {
+            int nameColIndex = c.getColumnIndex(DBHelper.NAME);
+            do {
+                soundHelp.add(c.getString(nameColIndex));
+            } while (c.moveToNext());
+        } else
+            c.close();
+        db.close();
     }
 
 
-    private static final String[] SUGGESTIONS = {
-            "Король и шут", "любе", "под гитару",
-            "Bahia", "Mato Grosso", "Minas Gerais",
-            "Tocantins", "Rio Grande do Sul"};
+    private static String[] SUGGESTIONS ;
 
-    private SearchView.OnQueryTextListener queryTextListener;
-     SearchView searchView;
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            getMenuInflater().inflate(R.menu.menu, menu);
-            // Retrieve the SearchView and plug it into SearchManager
-            searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
 
-            SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setSuggestionsAdapter(mAdapter);
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    populateAdapter(newText);
-                    return true;
+    SearchView searchView;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        // Retrieve the SearchView and plug it into SearchManager
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSuggestionsAdapter(mAdapter);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                populateAdapter(newText);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(!soundHelp.contains(query)){
+                    soundHelp.add(query);
+                    cv.put(DBHelper.NAME,query);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    db.insert(Constants.TABLE_NAME, null, cv);
+                    db.close();
                 }
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q,
-                            query, VKApiConst.AUTO_COMPLETE, SettingActivity.autoComplete,
-                            VKApiConst.COUNT, 100, VKApiConst.SORT, SettingActivity.sortType, PERFORMER_ONLY, SettingActivity.performerOnly));
-                    setListContent(request);
-                    return true;
-                }
-            });
+                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q,
+                        query, VKApiConst.AUTO_COMPLETE, SettingActivity.autoComplete,
+                        VKApiConst.COUNT, 100, VKApiConst.SORT, SettingActivity.sortType, PERFORMER_ONLY, SettingActivity.performerOnly));
+                setListContent(request);
+                return true;
+            }
+        });
 
-            searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-                @Override
-                public boolean onSuggestionClick(int position) {
-                   ;
-                    mAdapter.getCursor().moveToPosition(position);
-                    int id = mAdapter.getCursor().getColumnIndex(BaseColumns._ID);
-                    searchView.setQuery(SUGGESTIONS[mAdapter.getCursor().getInt(id)] ,true);
-                    return true;
-                }
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
+                ;
+                mAdapter.getCursor().moveToPosition(position);
+                int id = mAdapter.getCursor().getColumnIndex(BaseColumns._ID);
+                searchView.setQuery(SUGGESTIONS[mAdapter.getCursor().getInt(id)], true);
+                return true;
+            }
 
-                @Override
-                public boolean onSuggestionSelect(int position) {
-                    return false;
-                }
-            });
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+        });
 
-            return true;
+        return true;
 
     }
+
     private void populateAdapter(String query) {
 
-        final MatrixCursor c = new MatrixCursor(new String[]{ BaseColumns._ID, "cityName" });
-        for (int i=0; i<SUGGESTIONS.length; i++) {
-            if (SUGGESTIONS[i].toLowerCase().startsWith(query.toLowerCase())){
-                c.addRow(new Object[] {i, SUGGESTIONS[i]});
+        final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "cityName"});
+
+            SUGGESTIONS = soundHelp.toArray(new String[soundHelp.size()]);
+
+        for (int i = 0; i < SUGGESTIONS.length; i++) {
+            if (SUGGESTIONS[i].toLowerCase().startsWith(query.toLowerCase())) {
+                c.addRow(new Object[]{i, SUGGESTIONS[i]});
 
             }
         }
@@ -195,16 +221,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
-
-        final String[] from = new String[] {"cityName"};
-        final int[] to = new int[] {android.R.id.text1};
+        dbHelper = new DBHelper(this);
+        final String[] from = new String[]{"cityName"};
+        final int[] to = new int[]{R.id.help_sounds_id};
         mAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1,
+                R.layout.help_sound_item,
                 null,
                 from,
                 to,
                 CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-        
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -219,6 +245,14 @@ public class MainActivity extends AppCompatActivity
                     .add(R.id.list_container, listFragment)
                     .commit();
         }
+
+        containerHint = (TextView) findViewById(R.id.container_hint);
+        containerHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setIconified(false);
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -244,11 +278,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        searchView.setOnQueryTextListener(queryTextListener);
-        return super.onOptionsItemSelected(item);
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -308,15 +338,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_recomend) {
             final VKRequest request = VKApi.audio().getRecommendations();
             setListContent(request);
-        } else if (id == R.id.nav_update) {
-            getInfo();
-        } else if (id == R.id.nav_exit) {
-           SettingActivity.logined = false;
+        }  else if (id == R.id.nav_exit) {
+            SettingActivity.logined = false;
             saveStatusLogined();
             System.exit(0);
         } else if (id == R.id.nav_setting) {
             startActivity(new Intent(this, SettingActivity.class));
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -330,14 +359,20 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-
-                sounds = null;
                 sounds = new ArrayList<Sound>();
                 VKList<VKApiAudio> list = (VKList) response.parsedModel;
                 for (VKApiAudio audio : list) {
                     sounds.add(new Sound((audio.duration * 1000), audio.url, audio.title, audio.artist, audio.id));
                 }
-                SoundLab.get(MainActivity.this).addAllSound(sounds);
+                SoundLab.get().addAllSound(sounds);
+                if(sounds.size()==0){
+                    containerHint.setVisibility(View.VISIBLE);
+                    containerHint.setText(R.string.nothing_search);
+                    containerHint.setCompoundDrawablesWithIntrinsicBounds( 0,0, 0,  R.drawable.ic_mood_bad_black_24dp);}
+                else{
+                    containerHint.setVisibility(View.GONE);
+                }
+
                 ((SoundListFragment) listFragment).update();
                 new SizeFile().execute();
 
@@ -390,8 +425,15 @@ public class MainActivity extends AppCompatActivity
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             photoUser.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            saveObject(new User(byteArray, nameUser, 0));
+            curUser = new User(byteArray,nameUser,0);
+            saveObject(curUser);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 
     public void saveObject(User user) {
@@ -431,14 +473,12 @@ public class MainActivity extends AppCompatActivity
             URL url;
             URLConnection conetion;
             for (int i = 0; i < sounds.size(); i++)
-
             {
                 try {
                     url = new URL(sounds.get(i).getUrl());
                     conetion = url.openConnection();
                     conetion.connect();
                     sounds.get(i).setSize(getSizeFileMB(conetion.getContentLength()));
-
                 } catch (Exception e) {
                 }
             }
@@ -453,4 +493,6 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
 }

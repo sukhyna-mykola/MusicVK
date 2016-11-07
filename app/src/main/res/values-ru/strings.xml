@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">MusicVK</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="search">Искать</string>
+    <string name="my_music">Мои Аудиозаписи</string>
+    <string name="popular">Популярное</string>
+    <string name="recomend">Рекомендовано</string>
+    <string name="update">Оновить</string>
+    <string name="exit">Выйти</string>
+    <string name="setting">Настройки</string>
+    <string name="sort_by">Сортировать по</string>
+    <string name="auto_complete">Автокоректирование поиска</string>
+    <string name="performer_only">Поиск только по исполнителю</string>
+    <string name="login">Ввойти</string>
+    <string name="preferences">Mypref</string>
+    <string name="like">Понравилось</string>
+    <string name="cleared_histoty">Істория удалена</string>
+    <string name="input_search_query">Введите поисковый запрос</string>
+    <string name="clear_history">Удалить историю поиска</string>
+    <string name="nothing_search">Ничего не найдено( \n Попытайся заново</string>
+    <string name="downloading">загрузка . . .</string>
+    <string name="downloading_ended">Загрузка окончена</string>
+    <string name="player">Проигрыватель</string>
+    <string-array name="list_of_type_sort">
+        <item>Популярности</item>
+        <item>Время композиции</item>
+        <item>Дате добавление</item>
+    </string-array>
+    <integer name="com_vk_sdk_AppId">5152034</integer>
+</resources>

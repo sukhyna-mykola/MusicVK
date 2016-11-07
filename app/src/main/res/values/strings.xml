@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VKMusic</string>
+    <string name="app_name">MusicVK</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -12,11 +12,23 @@
     <string name="update">Оновити</string>
     <string name="exit">Вийти</string>
     <string name="setting">Налаштування</string>
-    <string name="sort">Сортувати</string>
+    <string name="sort_by">Сортувати по</string>
     <string name="auto_complete">Автокорегування</string>
     <string name="performer_only">Пошук тільки по виконавцю</string>
     <string name="login">Увійти</string>
     <string name="preferences">Mypref</string>
-
+    <string name="like">Сподобалось</string>
+    <string name="cleared_histoty">Історія видалена</string>
+    <string name="input_search_query">Введіть пошуковий запит</string>
+    <string name="clear_history">Видалити історію пошуку</string>
+    <string name="nothing_search">Нічого не знайдено( \n Спробуй знову</string>
+    <string name="downloading">завантаження . . .</string>
+    <string name="downloading_ended">Завантаження завершене</string>
+    <string name="player">Програвач</string>
+    <string-array name="list_of_type_sort">
+        <item>Популярності</item>
+        <item>Час композиції</item>
+        <item>Даті додавання</item>
+    </string-array>
     <integer name="com_vk_sdk_AppId">5152034</integer>
 </resources>

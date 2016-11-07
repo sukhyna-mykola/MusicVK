@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.vk.sdk.api.model.VKApiAudio;
 
@@ -48,7 +50,7 @@ public class SoundListFragment extends Fragment {
     BroadcastReceiver br;
 
     public static final String IDSOUND = "idSound";
-
+    private FloatingActionButton fab;
     private boolean isPlay;
     private int curentID = -1;
 
@@ -65,7 +67,9 @@ public class SoundListFragment extends Fragment {
                     update();
                 }
                 if (type == INIT) {
+
                     curentID = intent.getIntExtra(MusicService.PARAM_POS, curentID);
+
                 }
             }
         };
@@ -81,7 +85,7 @@ public class SoundListFragment extends Fragment {
         View v = inflater.inflate(R.layout.sound_list_fragment, container, false);
         mSoundRecyclerView = (RecyclerView) v.findViewById(R.id.sound_recycler_view);
         mSoundRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        final FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
+        fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +99,7 @@ public class SoundListFragment extends Fragment {
             Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
             intent.putExtra(PARAM_TYPE, PARAM_NULL);
             getActivity().sendBroadcast(intent);
+            fab.setVisibility(View.VISIBLE);
         }
         updateUI();
 
@@ -102,7 +107,7 @@ public class SoundListFragment extends Fragment {
     }
 
     private void updateUI() {
-        SoundLab soundLab = SoundLab.get(getActivity());
+        SoundLab soundLab = SoundLab.get();
         List<Sound> sounds = soundLab.getSounds();
         mAdapter = new ListAdapter(sounds);
         mSoundRecyclerView.setAdapter(mAdapter);
@@ -113,20 +118,20 @@ public class SoundListFragment extends Fragment {
     }
 
 
-    private class SoundHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class SoundHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageButton mImageButtonPlayPause;
         ImageButton mDownload;
         TextView mTitle;
         TextView mArtist;
         TextView mDuration;
         TextView mSize;
-        RelativeLayout v;
+        RelativeLayout mContainer;
 
         private Sound mSound;
 
         public SoundHolder(final View itemView) {
             super(itemView);
-            v = (RelativeLayout) itemView.findViewById(R.id.item_container);
+            mContainer = (RelativeLayout) itemView.findViewById(R.id.item_container);
             mImageButtonPlayPause = (ImageButton) itemView.findViewById(R.id.play_pause_item_button);
             mDownload = (ImageButton) itemView.findViewById(R.id.download_item_button);
             mTitle = (TextView) itemView.findViewById(R.id.title_item_text);
@@ -134,7 +139,8 @@ public class SoundListFragment extends Fragment {
             mDuration = (TextView) itemView.findViewById(R.id.duration_item_text);
             mSize = (TextView) itemView.findViewById(R.id.size_item_text);
 
-            v.setOnClickListener(this);
+            mContainer.setOnClickListener(this);
+            itemView.setOnClickListener(this);
             mImageButtonPlayPause.setOnClickListener(this);
 
             mDownload.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +156,6 @@ public class SoundListFragment extends Fragment {
         }
 
 
-
         private Intent sendActionToService(String type) {
             Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
             intent.putExtra(MusicService.PARAM_TYPE, type);
@@ -159,15 +164,10 @@ public class SoundListFragment extends Fragment {
 
         private void startMusicService() {
             curentID = mSound.getId();
-            for (Sound sound : SoundLab.get(getActivity()).getSounds()) {
-                if (sound.id != curentID) {
-                    sound.setUsing(false);
-                }
-            }
             musicIntent = new Intent(getActivity(), MusicService.class);
             musicIntent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
             musicIntent.putExtra(PARAM_POS, mSound.getId());
-            Log.d(TAG, "mSound.getId() " + mSound.getId());
+            SoundLab.get().setPlayList();
             getActivity().startService(musicIntent);
         }
 
@@ -178,13 +178,18 @@ public class SoundListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            if (curentID != mSound.getId()) {
-                curentID = mSound.getId();
-                Intent intent = sendActionToService(PARAM_PLAY_SOUND_POSITION);
-                intent.putExtra(PARAM_POS, curentID);
-                getActivity().sendBroadcast(intent);
-            } else {
-                if (isMyServiceRunning(MusicService.class)) {
+
+            if (isMyServiceRunning(MusicService.class)) {
+                if (curentID != mSound.getId()) {
+                    curentID = mSound.getId();
+
+                    if(!SoundLab.get().getCurentPlayList().contains(mSound))
+                        SoundLab.get().setPlayList();
+                    Intent intent = sendActionToService(PARAM_PLAY_SOUND_POSITION);
+                    intent.putExtra(PARAM_POS, curentID);
+                    getActivity().sendBroadcast(intent);
+                } else {
+
                     if (!isPlay) {
                         mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
                         Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
@@ -195,13 +200,14 @@ public class SoundListFragment extends Fragment {
                         getActivity().sendBroadcast(intent);
                     }
 
-                } else {
-                    startMusicService();
-                    mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
-                    v.setBackgroundColor(getResources().getColor(R.color.vk_light_color));
                 }
+            } else {
+                startMusicService();
+                mContainer.setBackgroundColor(getResources().getColor(R.color.vk_light_color));
+                fab.setVisibility(View.VISIBLE);
             }
         }
+
     }
 
     private class ListAdapter extends RecyclerView.Adapter<SoundHolder> {
@@ -233,14 +239,14 @@ public class SoundListFragment extends Fragment {
 
 
             if (sound.isUsing()) {
-                holder.v.setBackgroundColor(getResources().getColor(R.color.vk_light_color));
+                holder.mContainer.setBackgroundColor(getResources().getColor(R.color.vk_light_color));
                 if (isPlay) {
                     holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
                 } else
                     holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
             } else {
                 holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
-                holder.v.setBackgroundColor(Color.WHITE);
+                holder.mContainer.setBackgroundColor(Color.WHITE);
             }
         }
 
