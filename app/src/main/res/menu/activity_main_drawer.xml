@@ -16,6 +16,12 @@
             android:icon="@drawable/ic_queue_play_next_black_24dp"
             android:title="@string/recomend"/>
 
+        <item
+            android:id="@+id/nav_favorites"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="Понравилось"/>
+
+
 
     </group>
 

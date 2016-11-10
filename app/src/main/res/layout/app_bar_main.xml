@@ -2,11 +2,12 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:htext="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.sukhyna_mykola.vkmusic.MainActivity">
+    tools:context="com.sukhyna_mykola.musicvk.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -14,13 +15,22 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
 
-       <android.support.v7.widget.Toolbar
-           android:id="@+id/toolbar"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-       </android.support.v7.widget.Toolbar>
 
+        </android.support.v7.widget.Toolbar>
+        <com.hanks.htextview.HTextView
+            android:background="@color/black"
+            android:textSize="20sp"
+            android:padding="5dp"
+            android:id="@+id/category_show"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            htext:animateType="anvil"
+            />
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main"/>

@@ -9,5 +9,10 @@
         android:title="Search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/nav_current_play_list"
+        android:icon="@drawable/ic_queue_music_white_24dp"
+        android:title="@string/current_play_list"
+        app:showAsAction="always" />
 
 </menu>

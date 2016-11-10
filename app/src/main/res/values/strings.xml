@@ -25,10 +25,13 @@
     <string name="downloading">завантаження . . .</string>
     <string name="downloading_ended">Завантаження завершене</string>
     <string name="player">Програвач</string>
+    <string name="buffering">буферизація</string>
+    <string name="current_play_list">Текуший плейлист</string>
+    <string name="pref_search">Настройки поиска</string>
     <string-array name="list_of_type_sort">
         <item>Популярності</item>
         <item>Час композиції</item>
         <item>Даті додавання</item>
     </string-array>
-    <integer name="com_vk_sdk_AppId">5152034</integer>
+    <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>
