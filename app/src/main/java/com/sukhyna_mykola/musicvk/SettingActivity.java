@@ -23,6 +23,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     public static final String LOGINED_KEY = "LOGINED_KEY";
     public static final String RANDOM_KEY = "RANDOM_KEY";
     public static final String LOOPING_KEY = "LOOPING_KEY";
+    public static final String ID_KEY = "ID_KEY";
 
 
     private String[] dataSort;
@@ -31,6 +32,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     public static int autoComplete;
     public static int performerOnly;
     public static int sortType;
+    public static int id;
     public static boolean logined;
     public static boolean isLooping;
     public static boolean isRandom;
@@ -107,6 +109,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         ed.putInt(AUTO_COMPLETE_KEY, autoComplete);
         ed.putInt(PERFORMER_ONLY_KEY, performerOnly);
         ed.putBoolean(LOGINED_KEY, logined);
+        ed.putInt(ID_KEY,id);
 
         ed.commit();
 

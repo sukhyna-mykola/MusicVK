@@ -13,6 +13,8 @@
         android:src="@drawable/ic_music_note_black_24dp"/>
 
     <TextView
+        android:maxLines="5"
+        android:ellipsize="end"
         android:id="@+id/title_sound_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +25,8 @@
         />
 
     <TextView
+        android:maxLines="5"
+        android:ellipsize="end"
         android:id="@+id/artist_sound_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

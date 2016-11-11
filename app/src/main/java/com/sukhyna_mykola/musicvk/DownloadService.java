@@ -21,12 +21,21 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import static com.sukhyna_mykola.musicvk.MusicService.DATA_FROM_SERVICE;
+import static com.sukhyna_mykola.musicvk.MusicService.PARAM_TYPE;
 
 public class DownloadService extends Service {
     public DownloadService() {
 
     }
-    public final static int DOWNLOADED=4 ;
+
+    public final static int DOWNLOADED = 4;
+    public final static int DOWNLOADING = 5;
+    public final static String PARAM_DOWNLOAD_PROGRESS = " com.sukhyna_mykola.vkmusic.PARAM_DOWNLOAD_PROGRESS";
+    public final static String PARAM_DOWNLOADED = " com.sukhyna_mykola.vkmusic.PARAM_DOWNLOADED";
+    public final static int DOWNLOAD = 1;
+    public final static int SAVE = 2;
+
+
     public final static String URL_DOWNLOAD = " com.sukhyna_mykola.vkmusic.URL_DOWNLOAD";
     public final static String TITLE_DOWNLOAD = " com.sukhyna_mykola.vkmusic.TITLE_DOWNLOAD";
     public final static String ID_DOWNLOAD = " com.sukhyna_mykola.vkmusic.ID_DOWNLOAD";
@@ -34,11 +43,12 @@ public class DownloadService extends Service {
     public final static String ACTION_ADD_TO_FAVORITES = " com.sukhyna_mykola.vkmusic.ACTION_ADD_TO_FAVORITES ";
     String title;
     int id;
+    String actionType;
     String urdDownloading;
 
     NotificationManager mNotifyManager;
     NotificationCompat.Builder mBuilder;
-    Integer notificationID = 100;
+    static int notificationID = 100;
     int incr = 0;
     int lenghtOfFile = 0;
 
@@ -55,55 +65,63 @@ public class DownloadService extends Service {
 
         urdDownloading = intent.getStringExtra(URL_DOWNLOAD);
         title = intent.getStringExtra(TITLE_DOWNLOAD);
-        id =intent.getIntExtra(ID_DOWNLOAD,-1);
+        id = intent.getIntExtra(ID_DOWNLOAD, -1);
+        actionType = intent.getAction();
 
-        if (intent.getAction() == ACTION_DOWNLOAD) {
-            new DownloadFile().execute();
 
-            mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mBuilder = new NotificationCompat.Builder(this);
-            mBuilder.setContentTitle(title)
-                    .setContentText(getString(R.string.downloading))
+        new DownloadFile().execute();
+
+        mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setContentTitle(title);
+
+        if (actionType == ACTION_ADD_TO_FAVORITES) {
+            mBuilder.setContentText(getString(R.string.saving))
+                    .setSmallIcon(R.drawable.ic_favorite_black_24dp);
+        } else {
+            mBuilder.setContentText(getString(R.string.downloading))
                     .setSmallIcon(android.R.drawable.stat_sys_download);
+        }
 
-            new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
 
-                            while (incr < 100) {
+                        while (incr < 100) {
 
-                                mBuilder.setProgress(100, incr, false);
-                                mBuilder.setContentText(getSizeFileMB(lenghtOfFile * (incr) / 100.0) + "Mb / " + getSizeFileMB(lenghtOfFile) + "Mb");
-                                mNotifyManager.notify(notificationID, mBuilder.build());
+                            mBuilder.setProgress(100, incr, false);
+                            mBuilder.setContentText(getSizeFileMB(lenghtOfFile * (incr) / 100.0) + "Mb / " + getSizeFileMB(lenghtOfFile) + "Mb");
+                            mNotifyManager.notify(notificationID, mBuilder.build());
 
-                                try {
+                            try {
 
-                                    Thread.sleep(2 * 1000);
-                                } catch (InterruptedException e) {
-                                    ;
-                                }
+                                Thread.sleep(2 * 1000);
+                            } catch (InterruptedException e) {
+                                ;
                             }
-
+                        }
+                        if (actionType == ACTION_ADD_TO_FAVORITES) {
+                            mBuilder.setContentText(getString(R.string.saving_complete))
+                                    .setProgress(0, 0, false);
+                        } else {
                             mBuilder.setContentText(getString(R.string.downloading_ended))
-
                                     .setProgress(0, 0, false)
                                     .setSmallIcon(android.R.drawable.stat_sys_download_done);
-                            mNotifyManager.notify(notificationID, mBuilder.build());
-                        }
-                    }
 
-            ).start();
-        } else if (intent.getAction() == ACTION_ADD_TO_FAVORITES) {
-            id = intent.getIntExtra(ID_DOWNLOAD,-1);
-            new addToFavorites().execute();
-        }
+                        }
+                        mNotifyManager.notify(notificationID, mBuilder.build());
+                    }
+                }
+
+        ).start();
+
         return START_NOT_STICKY;
     }
 
-    private class DownloadFile extends AsyncTask<String, Integer, String> {
+    private class DownloadFile extends AsyncTask<String, Integer, File> {
         @Override
-        protected String doInBackground(String... urlParams) {
+        protected File doInBackground(String... urlParams) {
             int count;
             try {
                 URL url = new URL(urdDownloading);
@@ -112,10 +130,15 @@ public class DownloadService extends Service {
 
                 lenghtOfFile = conexion.getContentLength();
 
-
                 InputStream input = new BufferedInputStream(url.openStream());
-                OutputStream output = new FileOutputStream(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/" + title + ".mp3");
+                OutputStream output;
+                File tempMp3 = File.createTempFile("tmp", "mp3", getCacheDir());
+                if (actionType == ACTION_DOWNLOAD)
+                    output = new FileOutputStream(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/" + title + ".mp3");
+                else {
 
+                    output = new FileOutputStream(tempMp3);
+                }
                 byte data[] = new byte[1024];
 
                 long total = 0;
@@ -130,17 +153,28 @@ public class DownloadService extends Service {
                 output.flush();
                 output.close();
                 input.close();
+                return tempMp3;
             } catch (Exception e) {
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(File s) {
             super.onPostExecute(s);
-            SoundLab.mUser.addDownloadedDound(id);
-            sendEndDownloading();
-            saveObject(SoundLab.mUser);
+            if (actionType == ACTION_DOWNLOAD) {
+                SoundLab.mUser.addDownloadedDound(id);
+                sendEndAction(DOWNLOAD);
+            }
+            if (actionType == ACTION_ADD_TO_FAVORITES) {
+                if (s != null) {
+                    SoundLab.mUser.getSoundFavorite(id).setFile(s);
+                    sendEndAction(SAVE);
+                }
+
+            }
+
+            SoundLab.saveObject();
             mNotifyManager.cancel(notificationID);
             stopSelf();
 
@@ -149,6 +183,7 @@ public class DownloadService extends Service {
         @Override
         protected void onProgressUpdate(Integer... values) {
             incr = values[0];
+            sendDownloadingProgress(incr);
             super.onProgressUpdate(values);
         }
     }
@@ -160,58 +195,21 @@ public class DownloadService extends Service {
         else return String.valueOf(fileSizeInMB);
     }
 
-    private class addToFavorites extends AsyncTask<String, Integer, File> {
-        @Override
-        protected File doInBackground(String... urlParams) {
-            int count;
-            try {
-                URL url = new URL(urdDownloading);
-                URLConnection conexion = url.openConnection();
-                conexion.connect();
-                lenghtOfFile = conexion.getContentLength();
-                InputStream input = new BufferedInputStream(url.openStream());
-                byte data[] = new byte[1024];
-                long total = 0;
-                File tempMp3 = File.createTempFile("kurchina", "mp3", getCacheDir());
-                OutputStream output = new FileOutputStream(tempMp3);
 
-                while ((count = input.read(data)) != -1) {
-                    total += count;
-                    // publishProgress((int) (total * 100 / lenghtOfFile));
-                    output.write(data, 0, count);
-                }
-                output.flush();
-                output.close();
-                input.close();
-                return tempMp3;
-            } catch (Exception e) {
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(File s) {
-            super.onPostExecute(s);
-            if(s!=null)
-            SoundLab.mUser.getSoundFavorite(id).setFile(s);
-            stopSelf();
-
-        }
-
-
-    }
-    private void sendEndDownloading() {
+    private void sendEndAction(int what) {
         Intent intentPlayer = new Intent(DATA_FROM_SERVICE);
+        intentPlayer.putExtra(PARAM_TYPE, DOWNLOADED);
+        intentPlayer.putExtra(PARAM_DOWNLOADED, what);
         sendBroadcast(intentPlayer);
     }
-    private void saveObject(User user) {
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user"))); //Select where you wish to save the file...
-            oos.writeObject(user); // write the class as an 'object'
-            oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
-            oos.close();// close the stream
-        } catch (Exception ex) {
 
-        }
+
+    private void sendDownloadingProgress(int progress) {
+        Intent intentPlayer = new Intent(DATA_FROM_SERVICE);
+        intentPlayer.putExtra(PARAM_TYPE, DOWNLOADING);
+        intentPlayer.putExtra(PARAM_DOWNLOAD_PROGRESS, progress);
+        sendBroadcast(intentPlayer);
     }
+
+
 }

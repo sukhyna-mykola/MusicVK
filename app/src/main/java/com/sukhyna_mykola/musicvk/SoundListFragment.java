@@ -51,8 +51,6 @@ public class SoundListFragment extends Fragment {
     BroadcastReceiver br;
 
     public static final String ID_SOUND = "ID_SOUND";
-    public static final String TIME_SOUND = "TIME_SOUND";
-    public static final String IS_PLAY_SOUND = "IS_PLAY_SOUND";
 
     private FloatingActionButton fab;
     private boolean isPlay;
@@ -82,12 +80,15 @@ public class SoundListFragment extends Fragment {
                     update();
                 } else if (type == INIT) {
                     curentID = intent.getIntExtra(MusicService.PARAM_POS, curentID);
+                    update();
                 } else if (type == FINISH) {
                     fab.setVisibility(View.GONE);
+                    curentID = -1;
+                    isPlay = false;
+                    update();
                 }
                 if (type == BUFFERING) {
                     buffer = intent.getBooleanExtra(PARAM_BUFFERING, true);
-
                 }
                 if (type == DOWNLOADED) {
                     update();
@@ -225,6 +226,7 @@ public class SoundListFragment extends Fragment {
                         Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
                         getActivity().sendBroadcast(intent);
                     } else {
+
                         mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
                         Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
                         getActivity().sendBroadcast(intent);
@@ -264,7 +266,7 @@ public class SoundListFragment extends Fragment {
             holder.mDuration.setText(Constants.getTimeString(sound.getDuration()));
 
             if (SoundLab.mUser.containtSoundDown(sound.getId()))
-                holder.mDownload.setImageResource(R.drawable.ic_check_black_24dp);
+                holder.mDownload.setImageResource(R.drawable.ic_file_download_complete_black_24dp);
 
             if (sound.id == curentID) {
                 holder.mContainer.setCardBackgroundColor(getResources().getColor(R.color.vk_light_color));

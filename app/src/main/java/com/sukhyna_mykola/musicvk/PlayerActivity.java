@@ -32,7 +32,12 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
+import static com.sukhyna_mykola.musicvk.DownloadService.DOWNLOAD;
+import static com.sukhyna_mykola.musicvk.DownloadService.DOWNLOADED;
+import static com.sukhyna_mykola.musicvk.DownloadService.PARAM_DOWNLOADED;
+import static com.sukhyna_mykola.musicvk.DownloadService.SAVE;
 import static com.sukhyna_mykola.musicvk.MusicService.BUFFERING;
+import static com.sukhyna_mykola.musicvk.MusicService.DATA_FROM_SERVICE;
 import static com.sukhyna_mykola.musicvk.MusicService.FINISH;
 import static com.sukhyna_mykola.musicvk.MusicService.INIT;
 
@@ -53,33 +58,31 @@ import static com.sukhyna_mykola.musicvk.MusicService.UPDATING;
 public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
 
-    public static final String PLAY_LIST ="com.sukhyna_mykola.vkmusic.com.sukhyna_mykola.vkmusic.PLAY_LIST" ;
-    ImageButton playBtn;
-    ImageButton playerRepeatOne;
-    ImageButton playerRandomPos;
-    SeekBar secondaryProgres;
-
-    int percentProgresLoading;
-    private float x1, x2;
-
-    SeekBar progresMusic;
-    ViewPager pager;
-
-
-    public final static String DATA_FROM_SERVICE = "com.sukhyna_mykola.vkmusic.DATE_FROM_SERVICE";
-    TextView hTextView;
-    private int progres;
+    public static final String PLAY_LIST = "com.sukhyna_mykola.vkmusic.com.sukhyna_mykola.vkmusic.PLAY_LIST";
+    private ImageButton playBtn;
+    private ImageButton playerRepeatOne;
+    private ImageButton playerRandomPos;
+    private SeekBar secondaryProgres;
+    private SeekBar progresMusic;
+    private ViewPager pager;
+    private TextView bufferText;
     private TextView currentTime;
     private TextView endTime;
+    private ImageButton mLikeButton;
+    private ImageButton mDownloadButton;
+    private ImageButton mAddMusic;
+
+    private int percentProgresLoading;
+    private int progres;
     private boolean isPlay;
-    int id;
+    private boolean buffer;
+
+
+    private int id;
     private Sound mSound;
     private int curentPos = -1;
-    ImageButton mLikeButton;
-    LinearLayout bufferingInfoLayout;
-    private boolean buffer;
-    BroadcastReceiver mBroadcastReceiver;
 
+    BroadcastReceiver mBroadcastReceiver;
 
     private static final String TAG = "TAG";
 
@@ -90,42 +93,40 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         setContentView(R.layout.activity_player);
 
         id = getIntent().getIntExtra(SoundListFragment.ID_SOUND, -1);
-        mSound = SoundLab.get().getSound(id);
         progres = getIntent().getIntExtra(PARAM_PROGRESS, 0);
         isPlay = getIntent().getBooleanExtra(PARAM_PLAY, false);
+        buffer = getIntent().getBooleanExtra(PARAM_BUFFERING, false);
+
+        mSound = SoundLab.get().getSound(id);
+        curentPos = SoundLab.get().getCurentPlayList().indexOf(mSound);
 
         mLikeButton = (ImageButton) findViewById(R.id.player_favorite);
+        mDownloadButton = (ImageButton) findViewById(R.id.player_download);
+        mAddMusic = (ImageButton) findViewById(R.id.player_add_sound);
         currentTime = (TextView) findViewById(R.id.player_cur_time);
         endTime = (TextView) findViewById(R.id.player_end_time);
         secondaryProgres = (SeekBar) findViewById(R.id.player_secondary_progress);
-        buffer = getIntent().getBooleanExtra(PARAM_BUFFERING, false);
-        Log.d(TAG, "buffer  = " + buffer);
-        updateFavoriteButton();
-
-        curentPos = SoundLab.get().getCurentPlayList().indexOf(mSound);
-
-        hTextView = (TextView) findViewById(R.id.text_h);
-        if (buffer) {
-            hTextView.setText("...буферизація...");
-        } else {
-            hTextView.setText("# "+(curentPos +1) +" / " + SoundLab.get().getCurentPlayList().size());
-        }
-        bufferingInfoLayout = (LinearLayout) findViewById(R.id.player_buffer);
-
         playBtn = (ImageButton) findViewById(R.id.player_button_play_pause);
         playerRepeatOne = (ImageButton) findViewById(R.id.player_repeat_one);
         playerRandomPos = (ImageButton) findViewById(R.id.player_shuffle);
+        bufferText = (TextView) findViewById(R.id.text_h);
+        progresMusic = (SeekBar) findViewById(R.id.seekBar);
+        pager = (ViewPager) findViewById(R.id.viewPager);
+
+        progresMusic.setMax(mSound.getDuration());
+        progresMusic.setOnSeekBarChangeListener(this);
 
         setRandom(SettingActivity.isRandom);
         setLooping(SettingActivity.isLooping);
-        progresMusic = (SeekBar) findViewById(R.id.seekBar);
-        progresMusic.setMax(mSound.getDuration());
-        progresMusic.setOnSeekBarChangeListener(this);
-        if (buffer)
+        updateButtons();
+        if (buffer) {
             updateUI(progres, isPlay, 0);
-        else
+            bufferText.setText("...буферизація...");
+        } else {
             updateUI(progres, isPlay, 100);
-        pager = (ViewPager) findViewById(R.id.viewPager);
+            bufferText.setText("# " + (curentPos + 1) + " / " + SoundLab.get().getCurentPlayList().size());
+        }
+
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -153,9 +154,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         pager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-
                 Sound sound = SoundLab.get().getCurentPlayList().get(position);
-
                 return PlayerFragment.newInstance(sound.id);
             }
 
@@ -179,7 +178,6 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 int type = intent.getIntExtra(MusicService.PARAM_TYPE, -1);
                 if (type == UPDATING) {
 
-
                     progres = intent.getIntExtra(PARAM_PROGRESS, progresMusic.getProgress());
                     isPlay = intent.getBooleanExtra(MusicService.PARAM_PLAY, false);
                     percentProgresLoading = intent.getIntExtra(PARAM_PROGRESS_LOADING, percentProgresLoading);
@@ -190,33 +188,32 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 }
                 if (type == BUFFERING) {
                     buffer = intent.getBooleanExtra(PARAM_BUFFERING, false);
-                    Log.d(TAG, "buffer  " + buffer);
                     if (buffer) {
-                        hTextView.setText("...буферизація...");
+                        bufferText.setText("...буферизація...");
                     } else {
-                        hTextView.setText("# "+(curentPos +1)+" / " + SoundLab.get().getCurentPlayList().size());
+                        bufferText.setText("# " + (curentPos + 1) + " / " + SoundLab.get().getCurentPlayList().size());
                     }
                 }
                 if (type == INIT) {
 
-                    int id = intent.getIntExtra(MusicService.PARAM_POS, -1);
+                    id = intent.getIntExtra(MusicService.PARAM_POS, -1);
                     mSound = SoundLab.get().getSound(id);
-                    updateFavoriteButton();
 
-                   /* if (MainActivity.likeSounds.contains(mSound.id)) {
-                        mLikeButton.setImageResource(R.mipmap.ic_like_true);
-                        mLikeButton.animate().scaleY((float) 1).setInterpolator(new BounceInterpolator()).start();
-                        mLikeButton.animate().scaleX((float) 1).setInterpolator(new BounceInterpolator()).start();
-                    } else {
-                        mLikeButton.setImageResource(R.mipmap.ic_like_false);
-                        mLikeButton.animate().scaleY((float) 0.75).setInterpolator(new BounceInterpolator()).start();
-                        mLikeButton.animate().scaleX((float) 0.75).setInterpolator(new BounceInterpolator()).start();
-                    }*/
+                    updateButtons();
+
                     secondaryProgres.setProgress(0);
                     curentPos = SoundLab.get().getCurentPlayList().indexOf(SoundLab.get().getSound(id));
                     progresMusic.setMax(mSound.getDuration());
                     pager.setCurrentItem(curentPos);
 
+                }
+                if (type == DOWNLOADED) {
+                    if (intent.getIntExtra(PARAM_DOWNLOADED, 0) == DOWNLOAD) {
+                        updateButtons();
+                    }
+                    if (intent.getIntExtra(PARAM_DOWNLOADED, 0) == SAVE) {
+
+                    }
                 }
             }
         };
@@ -228,7 +225,6 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
     private void updateUI(int progress, boolean play, int percent) {
         if (progresMusic != null) {
             progresMusic.setProgress(progress);
-
         }
 
         if (secondaryProgres != null) {
@@ -250,34 +246,32 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
     }
 
 
-    private void updateFavoriteButton() {
+    private void updateButtons() {
         if (SoundLab.mUser.containtSoundFavorite(mSound.getId())) {
-
             mLikeButton.setImageResource(R.drawable.ic_favorite_black_24dp);
         } else {
             mLikeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-
         }
+
+        if (SoundLab.mUser.containtSoundDown(mSound.getId()))
+            mDownloadButton.setImageResource(R.drawable.ic_file_download_complete_black_24dp);
+        else
+            mDownloadButton.setImageResource(R.drawable.ic_file_download_black_24dp);
+
+        if (SoundLab.mUser.containtMyMusic(mSound.getId()))
+            mAddMusic.setImageResource(R.drawable.ic_check_black_24dp);
+        else
+            mAddMusic.setImageResource(R.drawable.ic_add_black_24dp);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         savePreference();
-        saveObject(SoundLab.mUser);
+        SoundLab.saveObject();
         unregisterReceiver(mBroadcastReceiver);
     }
 
-    private void saveObject(User user) {
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user"))); //Select where you wish to save the file...
-            oos.writeObject(user); // write the class as an 'object'
-            oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
-            oos.close();// close the stream
-        } catch (Exception ex) {
-
-        }
-    }
 
     private void sendActionToService(String type) {
         Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
@@ -335,9 +329,15 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 break;
             }
             case R.id.player_list_sounds_btn: {
+                MainActivity.textCategory = getResources().getString(R.string.current_play_list);
                 SoundLab.get().addAllSound((ArrayList<Sound>) SoundLab.get().getCurentPlayList());
                 Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
-                intent.putExtra(PLAY_LIST,true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                finish();
+            }
+            case R.id.player_search: {
+                Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 finish();
@@ -345,14 +345,12 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
             case R.id.player_repeat_one: {
                 SettingActivity.isLooping = !SettingActivity.isLooping;
                 setLooping(SettingActivity.isLooping);
-
                 sendActionToService(PARAM_LOOP);
                 break;
             }
             case R.id.player_shuffle: {
                 SettingActivity.isRandom = !SettingActivity.isRandom;
                 setRandom(SettingActivity.isRandom);
-
                 sendActionToService(PARAM_RAND);
                 break;
             }
@@ -366,15 +364,14 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                         Toast.makeText(PlayerActivity.this, "Композиція " + mSound.getTitle() + " додана в ваші аудіозаписи", Toast.LENGTH_SHORT).show();
                     }
                 });
-                SoundLab.mUser.addDownloadedDound(mSound.id);
+                SoundLab.mUser.addMyMusic(mSound);
+                updateButtons();
                 break;
             }
             case R.id.player_favorite: {
                 if (SoundLab.mUser.containtSoundFavorite(mSound.getId())) {
                     ((ImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
                     SoundLab.mUser.removeSoundFromFavorites(mSound.getId());
-
-
                 } else {
                     ((ImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
                     SoundLab.mUser.addFavotitesSound(mSound);
@@ -382,9 +379,20 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                     intentDownload.setAction(DownloadService.ACTION_ADD_TO_FAVORITES);
                     intentDownload.putExtra(DownloadService.ID_DOWNLOAD, mSound.getId());
                     intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
+                    intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle());
                     startService(intentDownload);
 
                 }
+                break;
+            }
+            case R.id.player_download: {
+                Intent intentDownload = new Intent(this, DownloadService.class);
+                intentDownload.setAction(DownloadService.ACTION_DOWNLOAD);
+                intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle() + "-" + mSound.getArtist());
+                intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
+                intentDownload.putExtra(DownloadService.ID_DOWNLOAD, mSound.getId());
+                startService(intentDownload);
+                break;
             }
         }
     }
@@ -408,9 +416,6 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
             playerRandomPos.setBackground(getResources().getDrawable(R.drawable.background_btn_none));
         ;
     }
-
-    int count = 0;
-    String[] combo = {"♩♪♬", "♪♬", "♩♬", "♩♪", "♩", "♪", "♬"};
 
 
 }

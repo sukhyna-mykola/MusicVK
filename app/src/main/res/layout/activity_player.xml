@@ -160,10 +160,22 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
         android:src="@drawable/ic_queue_music_black_24dp"/>
+    <ImageButton
+        android:id="@+id/player_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/player_list_sounds_btn"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/selector_btn_rect"
+        android:onClick="onClick"
+        android:src="@drawable/ic_search_black_24dp"/>
 
     <ImageButton
         android:id="@+id/player_add_sound"
@@ -175,7 +187,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
-        android:src="@drawable/ic_add_circle_outline_black_24dp"/>
+        android:src="@drawable/ic_add_black_24dp"/>
 
     <ImageButton
         android:id="@+id/player_favorite"
@@ -188,6 +200,18 @@
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
         android:src="@drawable/ic_favorite_border_black_24dp"/>
+
+    <ImageButton
+        android:id="@+id/player_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/player_favorite"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/selector_btn_rect"
+        android:onClick="onClick"
+        android:src="@drawable/ic_file_download_black_24dp"/>
 
 
 </RelativeLayout>

@@ -5,6 +5,8 @@
     >
 
     <ImageView
+        android:maxLines="5"
+        android:ellipsize="end"
         android:id="@+id/music_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,6 +15,9 @@
         android:src="@drawable/ic_music_note_black_24dp"/>
 
     <TextView
+        android:maxLines="5"
+        android:ellipsize="end"
+        android:paddingRight="60dp"
         android:layout_centerVertical="true"
         android:id="@+id/title_sound_player"
         android:layout_width="match_parent"

@@ -9,44 +9,31 @@ import java.io.Serializable;
  */
 
 public class Sound implements Serializable{
-    String size;
-    File file;
-
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public int getOwner() {
-        return owner;
-    }
-
-   //VKApiAudio mAudio;
-
-    int  owner;
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    boolean using;
 
     int duration;
     String url;
     String title;
     String artist;
     int id;
+    int  owner;
+    String size;
+    File file;
 
-
-
+    public File getFile() {
+        return file;
+    }
+    public void setFile(File file) {
+        this.file = file;
+    }
+    public int getOwner() {
+        return owner;
+    }
+    public String getSize() {
+        return size;
+    }
+    public void setSize(String size) {
+        this.size = size;
+    }
     public String getUrl() {
         return url;
     }
@@ -59,13 +46,11 @@ public class Sound implements Serializable{
     public int getDuration() {
         return duration;
     }
-
     public int getId() {
         return id;
     }
 
     public Sound(VKApiAudio apiAudio) {
-       // this.mAudio = apiAudio;
         this.duration = apiAudio.duration*1000;
         this.url = apiAudio.url;
         this.title = apiAudio.title;

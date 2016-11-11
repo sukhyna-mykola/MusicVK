@@ -9,40 +9,23 @@ import java.util.List;
  */
 
 public class User implements Serializable {
-    byte[] photo;
+
 
 
     List<Integer> downloadedSounds;
     List<Sound> favoritesSounds;
     List<Sound> myMusic;
 
-    public void setFavoritesSounds(List<Sound> favoritesSounds) {
-        this.favoritesSounds = favoritesSounds;
-    }
-
-    public List<Sound> getMyMusic() {
-        return myMusic;
-    }
-
-    public void setMyMusic(List<Sound> myMusic) {
-        this.myMusic = myMusic;
-    }
-
-    public List<Sound> getFavoritesSounds() {
-        return favoritesSounds;
-    }
-
-
-    public List<Integer> getDownloadedSounds() {
-        return downloadedSounds;
-    }
-
-    public void setDownloadedSounds(List<Integer> downloadedSounds) {
-        this.downloadedSounds = downloadedSounds;
-    }
-
+    byte[] photo;
     String name;
     int id;
+    boolean tmpUser;
+
+    public boolean isTmpUser() {
+        return tmpUser;
+    }
+
+
 
     public byte[] getPhoto() {
         return photo;
@@ -75,9 +58,16 @@ public class User implements Serializable {
         this.id = id;
         downloadedSounds = new ArrayList<>();
         favoritesSounds = new ArrayList<>();
+        myMusic = new ArrayList<>();
 
     }
+    public User() {
+        tmpUser = true;
+        downloadedSounds = new ArrayList<>();
+        favoritesSounds = new ArrayList<>();
+        myMusic = new ArrayList<>();
 
+    }
     public void addDownloadedDound(int id) {
         downloadedSounds.add(id);
     }
@@ -119,8 +109,15 @@ public class User implements Serializable {
 
         return false;
     }
-    public Sound getSoundFavorite(int idSound) {
+    public boolean containtMyMusic(int idSound) {
+        for (int i = 0; i < myMusic.size(); i++) {
+            if (myMusic.get(i).getId() == idSound)
+                return true;
+        }
+        return false;
+    }
 
+    public Sound getSoundFavorite(int idSound) {
         for (int i = 0; i < favoritesSounds.size(); i++) {
             if (favoritesSounds.get(i).getId() == idSound)
                 return favoritesSounds.get(i);

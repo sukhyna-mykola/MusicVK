@@ -28,6 +28,8 @@
     <string name="buffering">буферизація</string>
     <string name="current_play_list">Текуший плейлист</string>
     <string name="pref_search">Настройки поиска</string>
+    <string name="saving">Сохранение</string>
+    <string name="saving_complete">Збережено</string>
     <string-array name="list_of_type_sort">
         <item>Популярності</item>
         <item>Час композиції</item>

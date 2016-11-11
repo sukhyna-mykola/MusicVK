@@ -21,10 +21,11 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener,MediaPlayer.OnBufferingUpdateListener {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener {
 
     private static final String TAG = "TAG";
     private MediaPlayer mediaPlayer;
+
     PendingIntent pnextIntent;
     PendingIntent pplayIntent;
     PendingIntent pendingIntent;
@@ -44,7 +45,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private boolean randomPos;
     private boolean repeatPos;
     private boolean playing;
-    private  int percendLoadingSound;
+    private int percendLoadingSound;
 
     Context mContext;
 
@@ -142,17 +143,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             Log.i(TAG, "Constants.ACTION.STARTFOREGROUND_ACTION");
 
             currentSound = SoundLab.get().getSound(intent.getIntExtra(PARAM_POS, -1));
-
-
             position = SoundLab.get().getCurentPlayList().indexOf(currentSound);
 
-
+            sendPos();
             sendBuffering(!playing);
 
             initPlayer(currentSound);
 
             setNotificationIntent();
-
             Intent previousIntent = new Intent(this, MusicService.class);
             previousIntent.setAction(Constants.ACTION.PREV_ACTION);
             ppreviousIntent = PendingIntent.getService(this, 0,
@@ -181,7 +179,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
 
         } else if (intent.getAction().equals(Constants.ACTION.PREV_ACTION)) {
-
             prevSound();
             updateNotification();
 
@@ -214,8 +211,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, buildNotification().build());
     }
 
-    int pos;
-    String sBuffering = ".";
     private RemoteViews getComplexNotificationView() {
         // Using RemoteViews to bind custom layouts into Notification
         notificationView = new RemoteViews(this.getPackageName(), R.layout.notification_view);
@@ -227,24 +222,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
 
         // Locate and set the Text into customnotificationtext.xml TextViews
-        pos++;
+
         notificationView.setTextViewText(R.id.status_bar_track_name, currentSound.title);
         if (playing)
-               if(mediaPlayer.isPlaying())
-               {  if(pos%6==0)
-                   sBuffering = ".";
-               else
-                   sBuffering = '.'+sBuffering+'.';
-
-
-                   notificationView.setTextViewText(R.id.status_bar_buffer, sBuffering);
-               }
-               else{
-                   pos = 0;
-                   sBuffering = ".";
-                notificationView.setTextViewText(R.id.status_bar_buffer, sBuffering);
-               }
-        else{
+            notificationView.setTextViewText(R.id.status_bar_buffer, "");
+        else {
 
             notificationView.setTextViewText(R.id.status_bar_buffer, "...buffering...");
         }
@@ -312,7 +294,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }
             mediaPlayer.release();
         }
-
         unregisterReceiver(br);
     }
 
@@ -328,7 +309,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         intentPlayer.putExtra(PARAM_TYPE, UPDATING);
         intentPlayer.putExtra(PARAM_PROGRESS, (mediaPlayer.getCurrentPosition()));
         intentPlayer.putExtra(PARAM_PLAY, mediaPlayer.isPlaying());
-        intentPlayer.putExtra(PARAM_PROGRESS_LOADING,percendLoadingSound);
+        intentPlayer.putExtra(PARAM_PROGRESS_LOADING, percendLoadingSound);
         sendBroadcast(intentPlayer);
     }
 
@@ -342,7 +323,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         intentPlayer = new Intent(DATA_FROM_SERVICE);
         intentPlayer.putExtra(PARAM_TYPE, BUFFERING);
         intentPlayer.putExtra(PARAM_BUFFERING, show);
-
         sendBroadcast(intentPlayer);
     }
 
@@ -441,14 +421,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private boolean playMp3(File convertedFile) {
         try {
-            //currentSound.setUsing();
             FileInputStream fis = new FileInputStream(convertedFile);
             mediaPlayer.setDataSource(fis.getFD());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare();
             return true;
         } catch (IOException ex) {
-            String s = ex.toString();
             ex.printStackTrace();
         }
         return false;

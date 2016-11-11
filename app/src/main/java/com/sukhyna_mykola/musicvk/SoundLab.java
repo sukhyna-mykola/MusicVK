@@ -1,5 +1,10 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +74,17 @@ public class SoundLab {
         }
 
         return false;
+    }
+    public static void saveObject() {
+        if(!mUser.isTmpUser())
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user_"+mUser.getId()))); //Select where you wish to save the file...
+            oos.writeObject(mUser); // write the class as an 'object'
+            oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
+            oos.close();// close the stream
+        } catch (Exception ex) {
+
+        }
     }
 
 }
