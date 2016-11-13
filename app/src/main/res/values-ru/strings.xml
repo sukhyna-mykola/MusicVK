@@ -34,4 +34,6 @@
         <item>Дате добавления</item>
     </string-array>
     <integer name="com_vk_sdk_AppId">5721259</integer>
+    <string name="saving">Сохранение</string>
+    <string name="saving_complete">Збережено</string>
 </resources>

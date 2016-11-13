@@ -33,4 +33,6 @@
         <item>Date</item>
     </string-array>
     <integer name="com_vk_sdk_AppId">5721259</integer>
+    <string name="saving">Saving</string>
+    <string name="saving_complete">Saving complete</string>
 </resources>
