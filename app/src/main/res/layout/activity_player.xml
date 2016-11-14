@@ -1,8 +1,10 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:htext="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/tools">
 
 
     <LinearLayout
@@ -28,7 +30,7 @@
                 android:thumbOffset="0dp"/>
 
             <SeekBar
-                android:thumb="@drawable/thumb_first"
+
                 android:progressDrawable="@drawable/seek_bar_background_first"
                 android:layout_centerInParent="true"
                 android:id="@+id/seekBar"
@@ -61,7 +63,6 @@
                 android:layout_marginRight="16dp"/>
 
             <LinearLayout
-                android:id="@+id/player_buffer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/player_end_time"
@@ -164,6 +165,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
+        android:rotation="-8"
         android:src="@drawable/ic_queue_music_black_24dp"/>
     <ImageButton
         android:id="@+id/player_search"
@@ -175,6 +177,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
+        android:rotation="5"
         android:src="@drawable/ic_search_black_24dp"/>
 
     <ImageButton
@@ -187,9 +190,11 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
-        android:src="@drawable/ic_add_black_24dp"/>
+        android:src="@drawable/ic_add_black_24dp"
+        android:rotation="3"/>
 
     <ImageButton
+        android:rotation="-8"
         android:id="@+id/player_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -202,6 +207,7 @@
         android:src="@drawable/ic_favorite_border_black_24dp"/>
 
     <ImageButton
+  android:rotation="6"
         android:id="@+id/player_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

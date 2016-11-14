@@ -7,16 +7,17 @@
         android:color="#000000">
     </stroke>
     <corners
-        android:topLeftRadius="5dp"
-        android:topRightRadius="5dp"
+        android:bottomLeftRadius="5dp"
         android:bottomRightRadius="5dp"
-        android:bottomLeftRadius="5dp">
+        android:topLeftRadius="5dp"
+        android:topRightRadius="5dp">
     </corners>
+    <solid
+        android:color="@color/vk_light_color"/>
     <padding
-        android:top="5dp"
-        android:right="5dp"
+        android:bottom="5dp"
         android:left="5dp"
-        android:bottom="5dp"/>
-    <gradient
-        android:centerColor="@color/vk_light_color"/>
+        android:right="5dp"
+        android:top="5dp"/>
+
 </shape>

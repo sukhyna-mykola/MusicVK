@@ -33,7 +33,7 @@
 
         <service android:name="com.sukhyna_mykola.musicvk.MusicService">
         </service>
-        <service android:name="com.sukhyna_mykola.musicvk.DownloadService"/>
+        <service android:name="com.sukhyna_mykola.musicvk.LikeService"/>
 
         <activity
             android:parentActivityName="com.sukhyna_mykola.musicvk.MainActivity"

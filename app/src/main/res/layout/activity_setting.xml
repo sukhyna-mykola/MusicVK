@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_setting"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -152,7 +151,6 @@
 
 
                             <Button
-                                android:id="@+id/btn_clear_history"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
@@ -192,7 +190,6 @@
                         android:drawableLeft="@android:drawable/ic_dialog_info"/>
 
                     <android.support.v7.widget.CardView
-                        android:id="@+id/user_catd_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp">
@@ -297,7 +294,6 @@
 
 
                             <Button
-                                android:id="@+id/btn_clear_history_user"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"

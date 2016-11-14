@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,11 +22,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.sukhyna_mykola.musicvk.DownloadService.DOWNLOADED;
+import static com.sukhyna_mykola.musicvk.LikeService.DOWNLOADED;
 import static com.sukhyna_mykola.musicvk.MusicService.BUFFERING;
 import static com.sukhyna_mykola.musicvk.MusicService.FINISH;
 import static com.sukhyna_mykola.musicvk.MusicService.INIT;
@@ -93,6 +96,7 @@ public class SoundListFragment extends Fragment {
                 if (type == DOWNLOADED) {
                     update();
                 }
+
             }
         };
         IntentFilter intFilt = new IntentFilter(MusicService.DATA_FROM_SERVICE);
@@ -108,6 +112,7 @@ public class SoundListFragment extends Fragment {
         mSoundRecyclerView = (RecyclerView) v.findViewById(R.id.sound_recycler_view);
         mSoundRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         fab = (FloatingActionButton) v.findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,13 +174,7 @@ public class SoundListFragment extends Fragment {
             mDownload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intentDownload = new Intent(getActivity(), DownloadService.class);
-                    intentDownload.setAction(DownloadService.ACTION_DOWNLOAD);
-                    intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle() + "-" + mSound.getArtist());
-                    intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
-                    intentDownload.putExtra(DownloadService.ID_DOWNLOAD, mSound.getId());
-                    getActivity().startService(intentDownload);
-
+                    new DownloadSound(getActivity(),mSound);
                 }
             });
 
@@ -211,7 +210,6 @@ public class SoundListFragment extends Fragment {
 
                     if (!SoundLab.get().containtSound(mSound.getId())) {
                         SoundLab.get().setPlayList();
-
                     }
                     Intent intent = sendActionToService(PARAM_PLAY_SOUND_POSITION);
                     intent.putExtra(PARAM_POS, curentID);
@@ -222,12 +220,12 @@ public class SoundListFragment extends Fragment {
                     }
 
                     if (!isPlay) {
-                        mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+                        mImageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                         Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
                         getActivity().sendBroadcast(intent);
                     } else {
 
-                        mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+                        mImageButtonPlayPause.setImageResource(R.drawable.ic_pause_white_24dp);
                         Intent intent = sendActionToService(PARAM_PLAY_PAUSE);
                         getActivity().sendBroadcast(intent);
                     }
@@ -271,11 +269,11 @@ public class SoundListFragment extends Fragment {
             if (sound.id == curentID) {
                 holder.mContainer.setCardBackgroundColor(getResources().getColor(R.color.vk_light_color));
                 if (isPlay) {
-                    holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+                    holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_pause_white_24dp);
                 } else
-                    holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+                    holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
             } else {
-                holder.mImageButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+                holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 holder.mContainer.setCardBackgroundColor(Color.WHITE);
             }
         }

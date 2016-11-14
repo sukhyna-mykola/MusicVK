@@ -4,28 +4,23 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="search">Искать</string>
     <string name="my_music">Мои Аудиозаписи</string>
     <string name="popular">Популярное</string>
     <string name="recomend">Рекомендовано</string>
-    <string name="update">Оновить</string>
     <string name="exit">Выйти</string>
     <string name="setting">Настройки</string>
     <string name="sort_by">Сортировать по</string>
     <string name="auto_complete">Автокоректирование поиска</string>
     <string name="performer_only">Поиск только по исполнителю</string>
-    <string name="login">Ввойти</string>
     <string name="preferences">Mypref</string>
     <string name="like">Понравилось</string>
     <string name="cleared_histoty">Істория удалена</string>
     <string name="input_search_query">Введите поисковый запрос</string>
     <string name="clear_history">Удалить историю поиска</string>
-    <string name="nothing_search">Ничего не найдено( \n Попытайся заново</string>
+    <string name="nothing_search">Ничего не найдено(</string>
     <string name="downloading">загрузка . . .</string>
-    <string name="downloading_ended">Загрузка окончена</string>
     <string name="player">Проигрыватель</string>
-    <string name="buffering">буферизация</string>
+    <string name="buffering">...буферизация...</string>
     <string name="current_play_list">Текуший плейлист</string>
     <string name="pref_search">Настройки поиска</string>
     <string-array name="list_of_type_sort">
@@ -33,7 +28,15 @@
         <item>Время композиции</item>
         <item>Дате добавления</item>
     </string-array>
-    <integer name="com_vk_sdk_AppId">5721259</integer>
-    <string name="saving">Сохранение</string>
-    <string name="saving_complete">Збережено</string>
+    <string name="saved">Сохранено</string>
+    <string name="user_load_failed">Не удалось загрузить настройки пользователя</string>
+    <string name="eror">ОШИБКА</string>
+    <string name="empty_playlist">Плейлист пустой</string>
+    <string name="nothing_save">У вас нет сохраненных</string>
+    <string name="nothing_music">У вас еще нет аудиозаписей</string>
+    <string name="search_result">"Результаты поиска - "</string>
+    <string name="wait">Подождите. Сохранение...</string>
+    <string name="size">"Размер файла: "</string>
+    <string name="is_in_my_music">Даная композиция уже была добавлена в ваши аудиозаписи</string>
+    <string name="wait_add_fav">Зачакайте</string>
 </resources>

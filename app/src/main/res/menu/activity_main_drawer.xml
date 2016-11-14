@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single"
-        android:id="@+id/menu_top_group">
+        >
         <item
             android:id="@+id/nav_my_music"
             android:icon="@drawable/ic_library_books_black_24dp"
@@ -19,14 +19,14 @@
         <item
             android:id="@+id/nav_favorites"
             android:icon="@drawable/ic_favorite_black_24dp"
-            android:title="Понравилось"/>
+            android:title="@string/like"/>
 
 
 
     </group>
 
     <group
-        android:id="@+id/menu_sett_group"
+        android:id="@+id/setting_group"
         android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_setting"
@@ -37,7 +37,7 @@
 
     </group>
     <group
-        android:id="@+id/menu_exit_group"
+        android:id="@+id/exit_group"
         android:checkableBehavior="single">
 
         <item

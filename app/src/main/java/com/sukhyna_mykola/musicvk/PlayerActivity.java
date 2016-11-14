@@ -1,29 +1,23 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import com.vk.sdk.api.VKApi;
@@ -32,10 +26,9 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
-import static com.sukhyna_mykola.musicvk.DownloadService.DOWNLOAD;
-import static com.sukhyna_mykola.musicvk.DownloadService.DOWNLOADED;
-import static com.sukhyna_mykola.musicvk.DownloadService.PARAM_DOWNLOADED;
-import static com.sukhyna_mykola.musicvk.DownloadService.SAVE;
+
+import static com.sukhyna_mykola.musicvk.LikeService.DOWNLOADED;
+
 import static com.sukhyna_mykola.musicvk.MusicService.BUFFERING;
 import static com.sukhyna_mykola.musicvk.MusicService.DATA_FROM_SERVICE;
 import static com.sukhyna_mykola.musicvk.MusicService.FINISH;
@@ -113,6 +106,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         progresMusic = (SeekBar) findViewById(R.id.seekBar);
         pager = (ViewPager) findViewById(R.id.viewPager);
 
+
         progresMusic.setMax(mSound.getDuration());
         progresMusic.setOnSeekBarChangeListener(this);
 
@@ -121,7 +115,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         updateButtons();
         if (buffer) {
             updateUI(progres, isPlay, 0);
-            bufferText.setText("...буферизація...");
+            bufferText.setText(R.string.buffering);
         } else {
             updateUI(progres, isPlay, 100);
             bufferText.setText("# " + (curentPos + 1) + " / " + SoundLab.get().getCurentPlayList().size());
@@ -189,7 +183,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 if (type == BUFFERING) {
                     buffer = intent.getBooleanExtra(PARAM_BUFFERING, false);
                     if (buffer) {
-                        bufferText.setText("...буферизація...");
+                        bufferText.setText(R.string.buffering);
                     } else {
                         bufferText.setText("# " + (curentPos + 1) + " / " + SoundLab.get().getCurentPlayList().size());
                     }
@@ -208,12 +202,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
 
                 }
                 if (type == DOWNLOADED) {
-                    if (intent.getIntExtra(PARAM_DOWNLOADED, 0) == DOWNLOAD) {
-                        updateButtons();
-                    }
-                    if (intent.getIntExtra(PARAM_DOWNLOADED, 0) == SAVE) {
-
-                    }
+                    updateButtons();
                 }
             }
         };
@@ -249,19 +238,27 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
     private void updateButtons() {
         if (SoundLab.mUser.containtSoundFavorite(mSound.getId())) {
             mLikeButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+            mLikeButton.animate().rotation(360 + (-8)).start();
         } else {
             mLikeButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            mLikeButton.animate().rotation(-(360 + (-8))).start();
         }
 
-        if (SoundLab.mUser.containtSoundDown(mSound.getId()))
+        if (SoundLab.mUser.containtSoundDown(mSound.getId())) {
             mDownloadButton.setImageResource(R.drawable.ic_file_download_complete_black_24dp);
-        else
+            mDownloadButton.animate().rotation(360 + 6).start();
+        } else {
             mDownloadButton.setImageResource(R.drawable.ic_file_download_black_24dp);
+            mDownloadButton.animate().rotation(-(360 + 6)).start();
+        }
 
-        if (SoundLab.mUser.containtMyMusic(mSound.getId()))
+        if (SoundLab.mUser.containtMyMusic(mSound.getId())) {
             mAddMusic.setImageResource(R.drawable.ic_check_black_24dp);
-        else
+            mAddMusic.animate().rotation(360 + 3).start();
+        } else {
             mAddMusic.setImageResource(R.drawable.ic_add_black_24dp);
+            mAddMusic.animate().rotation(-(360 + 3)).start();
+        }
     }
 
     @Override
@@ -315,6 +312,7 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.player_button_play_pause: {
                 sendActionToService(MusicService.PARAM_PLAY_PAUSE);
@@ -355,43 +353,47 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
                 break;
             }
             case R.id.player_add_sound: {
-
-                final VKRequest addSound = VKApi.audio().add(VKParameters.from(VKApiConst.OWNER_ID, mSound.getOwner(), "audio_id", mSound.getId()));
-                addSound.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        Toast.makeText(PlayerActivity.this, "Композиція " + mSound.getTitle() + " додана в ваші аудіозаписи", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                SoundLab.mUser.addMyMusic(mSound);
-                updateButtons();
+                if (SoundLab.mUser.containtMyMusic(mSound.getId())) {
+                    final VKRequest addSound = VKApi.audio().add(VKParameters.from(VKApiConst.OWNER_ID, mSound.getOwner(), "audio_id", mSound.getId()));
+                    addSound.executeWithListener(new VKRequest.VKRequestListener() {
+                        @Override
+                        public void onComplete(VKResponse response) {
+                            super.onComplete(response);
+                            Toast.makeText(PlayerActivity.this, "Композиція " + mSound.getTitle() + " додана в ваші аудіозаписи", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    SoundLab.mUser.addMyMusic(mSound);
+                    updateButtons();
+                } else
+                    Toast.makeText(this, com.sukhyna_mykola.musicvk.R.string.is_in_my_music, Toast.LENGTH_SHORT).show();
                 break;
             }
             case R.id.player_favorite: {
-                if (SoundLab.mUser.containtSoundFavorite(mSound.getId())) {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                    SoundLab.mUser.removeSoundFromFavorites(mSound.getId());
-                } else {
-                    ((ImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
-                    SoundLab.mUser.addFavotitesSound(mSound);
-                    Intent intentDownload = new Intent(PlayerActivity.this, DownloadService.class);
-                    intentDownload.setAction(DownloadService.ACTION_ADD_TO_FAVORITES);
-                    intentDownload.putExtra(DownloadService.ID_DOWNLOAD, mSound.getId());
-                    intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
-                    intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle());
-                    startService(intentDownload);
 
+                if (SoundLab.mUser.containtSoundFavorite(mSound.getId())) {
+
+                        ((ImageButton) v).setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                        SoundLab.mUser.removeSoundFromFavorites(mSound.getId());
+
+
+                } else {
+                    if (!isMyServiceRunning(LikeService.class)) {
+
+                        ((ImageButton) v).setImageResource(R.drawable.ic_favorite_black_24dp);
+                        SoundLab.mUser.addFavotitesSound(mSound);
+                        Intent intentDownload = new Intent(PlayerActivity.this, LikeService.class);
+                        intentDownload.putExtra(LikeService.ID_DOWNLOAD, mSound.getId());
+                        intentDownload.putExtra(LikeService.URL_DOWNLOAD, mSound.getUrl());
+                        intentDownload.putExtra(LikeService.TITLE_DOWNLOAD, mSound.getTitle());
+                        startService(intentDownload);
+
+                    } else
+                        Toast.makeText(this, R.string.wait, Toast.LENGTH_SHORT).show();
                 }
                 break;
             }
             case R.id.player_download: {
-                Intent intentDownload = new Intent(this, DownloadService.class);
-                intentDownload.setAction(DownloadService.ACTION_DOWNLOAD);
-                intentDownload.putExtra(DownloadService.TITLE_DOWNLOAD, mSound.getTitle() + "-" + mSound.getArtist());
-                intentDownload.putExtra(DownloadService.URL_DOWNLOAD, mSound.getUrl());
-                intentDownload.putExtra(DownloadService.ID_DOWNLOAD, mSound.getId());
-                startService(intentDownload);
+                new DownloadSound(this, mSound);
                 break;
             }
         }
@@ -417,5 +419,13 @@ public class PlayerActivity extends AppCompatActivity implements SeekBar.OnSeekB
         ;
     }
 
-
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

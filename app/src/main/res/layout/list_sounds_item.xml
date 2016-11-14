@@ -23,7 +23,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
             android:background="@drawable/selector_btn"
-            android:src="@android:drawable/ic_media_play"/>
+            android:src="@drawable/ic_play_arrow_white_24dp"/>
 
         <ImageButton
             android:id="@+id/download_item_button"
@@ -35,6 +35,8 @@
             android:background="@drawable/selector_btn_rect"
             android:src="@drawable/ic_file_download_black_24dp"
             />
+
+
 
         <LinearLayout
             android:clickable="false"

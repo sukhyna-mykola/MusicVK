@@ -4,28 +4,23 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="search">Шукати</string>
     <string name="my_music">Мої Аудіозаписи</string>
     <string name="popular">Популярне</string>
     <string name="recomend">Рекомендовано</string>
-    <string name="update">Оновити</string>
     <string name="exit">Вийти</string>
     <string name="setting">Налаштування</string>
     <string name="sort_by">Сортувати по</string>
     <string name="auto_complete">Автокорегування</string>
     <string name="performer_only">Пошук тільки по виконавцю</string>
-    <string name="login">Увійти</string>
     <string name="preferences">Mypref</string>
     <string name="like">Сподобалось</string>
     <string name="cleared_histoty">Історія видалена</string>
     <string name="input_search_query">Введіть пошуковий запит</string>
     <string name="clear_history">Видалити історію пошуку</string>
-    <string name="nothing_search">Нічого не знайдено( \n Спробуй знову</string>
+    <string name="nothing_search">Нічого не знайдено(</string>
     <string name="downloading">завантаження . . .</string>
-    <string name="downloading_ended">Завантаження завершене</string>
     <string name="player">Плеєр</string>
-    <string name="buffering">буферизація</string>
+    <string name="buffering">...буферизація...</string>
     <string name="current_play_list">Поточний плейліст</string>
     <string name="pref_search">Налаштування пошуку</string>
     <string-array name="list_of_type_sort">
@@ -33,7 +28,16 @@
         <item>Час композиції</item>
         <item>Даті додавання</item>
     </string-array>
-    <integer name="com_vk_sdk_AppId">5721259</integer>
-    <string name="saving">Сохранение</string>
-    <string name="saving_complete">Збережено</string>
+
+    <string name="saved">Збережено</string>
+    <string name="user_load_failed">Не вдалося завантажити конфігурацію користувача</string>
+    <string name="eror">ПОМИЛКА</string>
+    <string name="empty_playlist">Плейліст пустий</string>
+    <string name="nothing_save">У вас ще немає збережених</string>
+    <string name="nothing_music">У вас ще немає аудіозаписів</string>
+    <string name="search_result">"Результати пошуку - "</string>
+    <string name="wait">Зачекайте. Триває завантаження</string>
+    <string name="size">"Розмір файлу: "</string>
+    <string name="is_in_my_music">Дана композиція є в ваших аудіозаписах</string>
+    <string name="wait_add_fav">Зачакайте</string>
 </resources>

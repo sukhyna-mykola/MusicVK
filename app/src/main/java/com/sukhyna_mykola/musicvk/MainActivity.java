@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity
     public static final int SEARCH_SOUNDS = 4;
     public static final int PLAY_LIST_SOUNDS = 5;
     public static final int ERROR = 6;
+    
+    public static final String USER_FOLDER = "/VKMusicPlayer/.user_";
 
     SharedPreferences sPref;
     Fragment listFragment;
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                textCategory = "Результаты поиска - " + query;
+                textCategory = getString(R.string.search_result) + query;
                 categoryShow.animateText(textCategory);
                 if (!soundHelp.contains(query)) {
                     soundHelp.add(query);
@@ -170,7 +172,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         dbHelper = new DBHelper(this);
-        final String[] from = new String[]{"cityName"};
+        final String[] from = new String[]{"fild"};
         final int[] to = new int[]{R.id.help_sounds_id};
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.help_sound_item,
@@ -228,7 +230,7 @@ public class MainActivity extends AppCompatActivity
             if (!folder.exists()) {
                 folder.mkdirs();
             }
-            loadUser(new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user_"+SettingActivity.id));
+            loadUser(new File(Environment.getExternalStorageDirectory() + USER_FOLDER+SettingActivity.id));
         }
 
 
@@ -287,7 +289,7 @@ public class MainActivity extends AppCompatActivity
                 SettingActivity.logined = true;
 
                 saveStatusLogined();
-                File userTmp = new File(Environment.getExternalStorageDirectory() + "/VKMusicPlayer/.user_"+id);
+                File userTmp = new File(Environment.getExternalStorageDirectory() + USER_FOLDER+id);
                 if(userTmp.exists())
                     loadUser(userTmp);else
                 new DownloadImageTask(imageUserView).execute(user.get(0).photo_200);
@@ -351,7 +353,6 @@ public class MainActivity extends AppCompatActivity
                 setHintBackGround(true, FAVORITE_SOUNDS);
             else setHintBackGround(false, FAVORITE_SOUNDS);
             SoundLab.get().addAllSound((ArrayList<Sound>) SoundLab.mUser.favoritesSounds);
-
             ((SoundListFragment) listFragment).update();
         }
 
@@ -369,44 +370,44 @@ public class MainActivity extends AppCompatActivity
             switch (type) {
                 case MY_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("У вас еще нет аудиозаписей");
-                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_music_video_black_128dp);
+                    containerHintView.setText(R.string.nothing_music);
+                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_active_search);
                     break;
                 }
                 case FAVORITE_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("У вас нет сохраненных");
+                    containerHintView.setText(R.string.nothing_save);
                     containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_favorite_black_24dp);
                     break;
                 }
                 case POPULAR_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("..........");
-                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_people_black_24dp);
+                    containerHintView.setText("");
+                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_sad_face);
                     break;
                 }
                 case RECOMENDET_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("У вас нет рекомендованых");
-                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_mood_bad_black_24dp);
+                    containerHintView.setText("");
+                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0,R.drawable.ic_sad_face);
                     ;
                     break;
                 }
                 case PLAY_LIST_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("Плейлист пустой");
+                    containerHintView.setText(R.string.empty_playlist);
                     containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_queue_music_black_128dp);
                     break;
                 }
                 case SEARCH_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("Нечего не найдено( ");
+                    containerHintView.setText(R.string.nothing_search);
                     containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_sad_face);
                     break;
                 }
                 case ERROR: {
                     containerHintView.setVisibility(View.VISIBLE);
-                    containerHintView.setText("ОШИБКА");
+                    containerHintView.setText(R.string.eror);
                     containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_sad_face);
                     break;
                 }
@@ -568,7 +569,7 @@ public class MainActivity extends AppCompatActivity
 
         } catch (Exception ex) {
             SoundLab.mUser = new User();
-            Toast.makeText(this, "Не удалось загрузить настройки пользователя ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.user_load_failed, Toast.LENGTH_SHORT).show();
             ex.printStackTrace();
         }
 
@@ -576,7 +577,7 @@ public class MainActivity extends AppCompatActivity
 
     private void populateAdapter(String query) {
 
-        final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "cityName"});
+        final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "fild"});
 
         soundHelpArray = soundHelp.toArray(new String[soundHelp.size()]);
 

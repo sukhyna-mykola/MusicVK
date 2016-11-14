@@ -49,7 +49,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     Context mContext;
 
-    public final static String PARAM_TYPE = "com.sukhyna_mykola.vkmusic.play_play.PARAM_TYPE";
+    public final static String PARAM_TYPE = "com.sukhyna_mykola.vkmusic.PARAM_TYPE";
     public static final int INIT = 0;
     public static final int UPDATING = 1;
     public final static int FINISH = 2;
@@ -58,15 +58,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public final static String DATA_FROM_SERVICE = "com.sukhyna_mykola.vkmusic.DATE_FROM_SERVICE";
     public final static String DATA_TO_SERVICE = " com.sukhyna_mykola.vkmusic.DATA_TO_SERVICE";
 
-    public final static String PARAM_PLAY_PAUSE = "com.sukhyna_mykola.vkmusic.play_play.PARAM_PLAY_PAUSE";
-    public final static String PARAM_BUFFERING = "com.sukhyna_mykola.vkmusic.play_play.PARAM_BUFFERING";
-    public final static String PARAM_NEXT_SOUND = "com.sukhyna_mykola.vkmusic.play_play.PARAM_NEXT_SOUND";
-    public final static String PARAM_PREV_SOUND = "com.sukhyna_mykola.vkmusic.play_play.PARAM_PREV_SOUND";
-    public final static String PARAM_NULL = "com.sukhyna_mykola.vkmusic.play_play.PARAM_NULL";
-    public final static String PARAM_SEEK_TO = "com.sukhyna_mykola.vkmusic.play_play.PARAM_SEEK_TO";
-    public final static String PARAM_LOOP = "com.sukhyna_mykola.vkmusic.play_play.PARAM_LOOP";
-    public final static String PARAM_RAND = "com.sukhyna_mykola.vkmusic.play_play.PARAM_RAND";
-    public final static String PARAM_PLAY_SOUND_POSITION = "com.sukhyna_mykola.vkmusic.play_play.PARAM_PLAY_SOUND_POSITION";
+    public final static String PARAM_PLAY_PAUSE = "com.sukhyna_mykola.vkmusic.PARAM_PLAY_PAUSE";
+    public final static String PARAM_BUFFERING = "com.sukhyna_mykola.vkmusic.PARAM_BUFFERING";
+    public final static String PARAM_NEXT_SOUND = "com.sukhyna_mykola.vkmusic.PARAM_NEXT_SOUND";
+    public final static String PARAM_PREV_SOUND = "com.sukhyna_mykola.vkmusic.PARAM_PREV_SOUND";
+    public final static String PARAM_NULL = "com.sukhyna_mykola.vkmusic.PARAM_NULL";
+    public final static String PARAM_SEEK_TO = "com.sukhyna_mykola.vkmusic.PARAM_SEEK_TO";
+    public final static String PARAM_LOOP = "com.sukhyna_mykola.vkmusic.PARAM_LOOP";
+    public final static String PARAM_RAND = "com.sukhyna_mykola.vkmusic.PARAM_RAND";
+    public final static String PARAM_PLAY_SOUND_POSITION = "com.sukhyna_mykola.vkmusic.PARAM_PLAY_SOUND_POSITION";
 
 
     public final static String PARAM_PROGRESS = "com.sukhyna_mykola.vkmusic.PARAM_PROGRESS ";
@@ -216,9 +216,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         notificationView = new RemoteViews(this.getPackageName(), R.layout.notification_view);
         // Locate and set the Image into customnotificationtext.xml ImageViews
         if (mediaPlayer.isPlaying())
-            notificationView.setImageViewResource(R.id.status_bar_play, android.R.drawable.ic_media_pause);
+            notificationView.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_white_24dp);
         else
-            notificationView.setImageViewResource(R.id.status_bar_play, android.R.drawable.ic_media_play);
+            notificationView.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_white_24dp);
 
 
         // Locate and set the Text into customnotificationtext.xml TextViews
@@ -228,7 +228,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             notificationView.setTextViewText(R.id.status_bar_buffer, "");
         else {
 
-            notificationView.setTextViewText(R.id.status_bar_buffer, "...buffering...");
+            notificationView.setTextViewText(R.id.status_bar_buffer, getResources().getString(R.string.buffering));
         }
 
         notificationView.setTextViewText(R.id.status_bar_artist_name, currentSound.artist);
@@ -250,16 +250,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setContentIntent(pendingIntent);
 
         if (mediaPlayer.isPlaying())
-            builder.setSmallIcon(android.R.drawable.ic_media_play);
+            builder.setSmallIcon(R.drawable.ic_play_arrow_white_24dp);
         else
-            builder.setSmallIcon(android.R.drawable.ic_media_pause);
+            builder.setSmallIcon(R.drawable.ic_pause_white_24dp);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             builder = builder.setCustomBigContentView(getComplexNotificationView());
         } else {
             builder = builder.setContentTitle(currentSound.title)
                     .setContentText(currentSound.artist)
-                    .setSmallIcon(android.R.drawable.ic_menu_gallery);
+                    .setSmallIcon(R.drawable.ic_play_arrow_white_24dp);
         }
         return builder;
     }
