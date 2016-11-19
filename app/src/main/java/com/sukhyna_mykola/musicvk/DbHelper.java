@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by mikola on 07.11.2016.
  */
 
-class DBHelper extends SQLiteOpenHelper {
+class DbHelper extends SQLiteOpenHelper {
     public static final String NAME = "name";
 
-    public DBHelper(Context context) {
+    public DbHelper(Context context) {
         super(context, Constants.DB_NAME, null, 1);
     }
 

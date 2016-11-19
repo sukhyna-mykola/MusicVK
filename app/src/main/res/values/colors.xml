@@ -3,4 +3,5 @@
     <color name="colorAccent">#ff406a</color>
     <color name="black">#BA000000</color>
     <color name="white">#ffffff</color>
+    <color name="transparent">#705477a3</color>
 </resources>

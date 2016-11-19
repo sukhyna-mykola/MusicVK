@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.widget.Toast;
 
+import java.io.File;
+
 import static com.sukhyna_mykola.musicvk.LikeService.DOWNLOADED;
 import static com.sukhyna_mykola.musicvk.MusicService.DATA_FROM_SERVICE;
 import static com.sukhyna_mykola.musicvk.MusicService.PARAM_TYPE;
@@ -19,14 +21,17 @@ import static com.sukhyna_mykola.musicvk.MusicService.PARAM_TYPE;
  */
 
 public class DownloadSound {
-    DownloadManager mDownloadManager;
-    String downloadURL;
-    long myDownloadRefference;
-    BroadcastReceiver receiverDownloadComplete;
-    Context mContext;
-    int id;
 
-    public DownloadSound(Context context, Sound sound) {
+    private DownloadManager mDownloadManager;
+    private long myDownloadRefference;
+    private BroadcastReceiver receiverDownloadComplete;
+
+    private Context mContext;
+
+    private String downloadURL;
+    private int id;
+
+    public DownloadSound(Context context, final Sound sound) {
         downloadURL = sound.url;
         Toast.makeText(context, context.getResources().getString(R.string.downloading), Toast.LENGTH_SHORT).show();
         id = sound.id;
@@ -34,21 +39,21 @@ public class DownloadSound {
         mDownloadManager = (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
         Uri uri = Uri.parse(downloadURL);
         final DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setDestinationInExternalFilesDir(mContext, Environment.getExternalStorageDirectory() + "/VKMusicPlayer", sound.title + ".mp3");
+        request.setDestinationInExternalPublicDir(SettingActivity.FOLDER_DOWNLOAD.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), sound.title + ".mp3");
+
+        //обчислення розміру файла
         new Thread(new Runnable() {
             @Override
             public void run() {
-                request.setDescription(mContext.getString(R.string.size)+Constants.SizeFile(downloadURL)+"Mb");
+                request.setDescription(mContext.getString(R.string.size) + Constants.SizeFile(downloadURL) + "Mb");
                 myDownloadRefference = mDownloadManager.enqueue(request);
             }
         }).start();
 
 
-
         request.setTitle(sound.getTitle())
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
 
 
         request.setVisibleInDownloadsUi(true);
@@ -63,6 +68,7 @@ public class DownloadSound {
                 if (myDownloadRefference == reference) {
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(reference);
+
                     Cursor cursor = mDownloadManager.query(query);
                     cursor.moveToFirst();
                     int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
@@ -75,14 +81,9 @@ public class DownloadSound {
                             intentPlayer.putExtra(PARAM_TYPE, DOWNLOADED);
                             mContext.sendBroadcast(intentPlayer);
                             SoundLab.saveObject();
-
-
                             break;
                         }
-                        case DownloadManager.STATUS_RUNNING: {
 
-                            break;
-                        }
                     }
                 }
             }

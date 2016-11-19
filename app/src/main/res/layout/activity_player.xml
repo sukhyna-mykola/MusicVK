@@ -1,10 +1,10 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:htext="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/tools"
+    xmlns:htext="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:custom="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
 
     <LinearLayout
@@ -21,21 +21,21 @@
             android:layout_gravity="center">
 
             <SeekBar
-                android:layout_centerInParent="true"
-                android:progressDrawable="@drawable/seek_bar_background_second"
-                android:thumb="@color/cardview_dark_background"
                 android:id="@+id/player_secondary_progress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:progressDrawable="@drawable/seek_bar_background_second"
+                android:thumb="@color/cardview_dark_background"
                 android:thumbOffset="0dp"/>
 
             <SeekBar
 
-                android:progressDrawable="@drawable/seek_bar_background_first"
-                android:layout_centerInParent="true"
                 android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:progressDrawable="@drawable/seek_bar_background_first"
 
                 />
 
@@ -137,7 +137,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_weight="1"
                 android:background="@drawable/background_btn_none"
                 android:onClick="onClick"
                 android:src="@drawable/ic_repeat_one_black_24dp"/>
@@ -146,14 +145,6 @@
 
     </LinearLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/lplayer"
-        >
-
-    </android.support.v4.view.ViewPager>
 
     <ImageButton
         android:id="@+id/player_list_sounds_btn"
@@ -165,8 +156,8 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
-        android:rotation="-8"
         android:src="@drawable/ic_queue_music_black_24dp"/>
+
     <ImageButton
         android:id="@+id/player_search"
         android:layout_width="wrap_content"
@@ -177,7 +168,6 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
-        android:rotation="5"
         android:src="@drawable/ic_search_black_24dp"/>
 
     <ImageButton
@@ -190,11 +180,9 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/selector_btn_rect"
         android:onClick="onClick"
-        android:src="@drawable/ic_add_black_24dp"
-        android:rotation="3"/>
+        android:src="@drawable/ic_add_black_24dp"/>
 
     <ImageButton
-        android:rotation="-8"
         android:id="@+id/player_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -207,7 +195,6 @@
         android:src="@drawable/ic_favorite_border_black_24dp"/>
 
     <ImageButton
-  android:rotation="6"
         android:id="@+id/player_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -219,5 +206,42 @@
         android:onClick="onClick"
         android:src="@drawable/ic_file_download_black_24dp"/>
 
+
+    <ImageButton
+        android:id="@+id/player_info"
+        android:src="@drawable/ic_expand_more_black_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+
+        android:background="@drawable/selector_btn_circle"
+        android:onClick="onClick"
+        />
+
+    <FrameLayout
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/lplayer"
+        android:layout_below="@+id/player_info"
+        android:layout_toLeftOf="@+id/player_add_sound"
+        android:layout_toRightOf="@+id/player_list_sounds_btn">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v4.view.ViewPager>
+
+        <FrameLayout
+            android:id="@+id/view_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+    </FrameLayout>
 
 </RelativeLayout>

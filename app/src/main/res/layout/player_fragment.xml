@@ -8,31 +8,28 @@
         android:id="@+id/music_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:src="@drawable/ic_music_note_black_24dp"/>
 
     <TextView
-        android:maxLines="5"
+        android:maxLines="4"
         android:ellipsize="end"
         android:id="@+id/title_sound_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/music_note"
         android:gravity="center"
-        android:text="dcs,;l,lc;ds,;'lsdvs;l,vsd;ls,vd"
-        android:textSize="20sp"
+        android:textSize="18sp"
         />
 
     <TextView
-        android:maxLines="5"
+        android:maxLines="4"
         android:ellipsize="end"
         android:id="@+id/artist_sound_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_sound_player"
         android:gravity="center"
-        android:text="dcs,;l,lc;ds,;'lsdvs;l,vsd;ls,vd"
         />
 </RelativeLayout>
 

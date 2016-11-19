@@ -10,8 +10,6 @@ import java.util.List;
 
 public class User implements Serializable {
 
-
-
     List<Integer> downloadedSounds;
     List<Sound> favoritesSounds;
     List<Sound> myMusic;
@@ -80,6 +78,10 @@ public class User implements Serializable {
         myMusic.add(newSound);
     }
 
+    public List<Integer> getDownloadedSounds() {
+        return downloadedSounds;
+    }
+
     public void removeSoundFromFavorites(int idSound) {
         int indexRemove = -1;
         for (int i = 0; i < favoritesSounds.size(); i++) {
@@ -124,6 +126,10 @@ public class User implements Serializable {
         }
 
         return null;
+    }
+    public  void clearHistoryDownload(){
+        downloadedSounds.clear();
+        downloadedSounds = new ArrayList<>();
     }
 
 }

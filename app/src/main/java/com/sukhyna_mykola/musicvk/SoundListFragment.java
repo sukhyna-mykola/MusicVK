@@ -48,14 +48,15 @@ import static com.sukhyna_mykola.musicvk.MusicService.UPDATING;
 
 public class SoundListFragment extends Fragment {
     private static final String TAG = "SoundListFragment";
-    private RecyclerView mSoundRecyclerView;
-    private ListAdapter mAdapter;
-    Intent musicIntent;
-    BroadcastReceiver br;
-
     public static final String ID_SOUND = "ID_SOUND";
 
+    private RecyclerView mSoundRecyclerView;
     private FloatingActionButton fab;
+
+    private ListAdapter mAdapter;
+    private Intent musicIntent;
+    private BroadcastReceiver br;
+
     private boolean isPlay;
     private int progres;
     private int curentID = -1;
@@ -66,7 +67,6 @@ public class SoundListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
         update();
     }
 
@@ -89,11 +89,9 @@ public class SoundListFragment extends Fragment {
                     curentID = -1;
                     isPlay = false;
                     update();
-                }
-                if (type == BUFFERING) {
+                } else if (type == BUFFERING) {
                     buffer = intent.getBooleanExtra(PARAM_BUFFERING, true);
-                }
-                if (type == DOWNLOADED) {
+                } else if (type == DOWNLOADED) {
                     update();
                 }
 
@@ -174,10 +172,9 @@ public class SoundListFragment extends Fragment {
             mDownload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new DownloadSound(getActivity(),mSound);
+                    new DownloadSound(getActivity(), mSound);
                 }
             });
-
         }
 
 
@@ -261,12 +258,15 @@ public class SoundListFragment extends Fragment {
 
             holder.mTitle.setText(sound.title);
             holder.mArtist.setText(sound.artist);
-            holder.mDuration.setText(Constants.getTimeString(sound.getDuration()));
+            holder.mDuration.setText(sound.durationString);
 
             if (SoundLab.mUser.containtSoundDown(sound.getId()))
                 holder.mDownload.setImageResource(R.drawable.ic_file_download_complete_black_24dp);
+            else
+                holder.mDownload.setImageResource(R.drawable.ic_file_download_black_24dp);
 
             if (sound.id == curentID) {
+                //  holder.mImageButtonPlayPause.setVisibility(View.VISIBLE);
                 holder.mContainer.setCardBackgroundColor(getResources().getColor(R.color.vk_light_color));
                 if (isPlay) {
                     holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_pause_white_24dp);
@@ -274,6 +274,7 @@ public class SoundListFragment extends Fragment {
                     holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
             } else {
                 holder.mImageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                //  holder.mImageButtonPlayPause.setVisibility(View.GONE);
                 holder.mContainer.setCardBackgroundColor(Color.WHITE);
             }
         }
@@ -282,7 +283,6 @@ public class SoundListFragment extends Fragment {
         public int getItemCount() {
             return mSounds.size();
         }
-
 
     }
 

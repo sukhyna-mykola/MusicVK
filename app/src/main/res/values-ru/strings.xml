@@ -10,19 +10,19 @@
     <string name="exit">Выйти</string>
     <string name="setting">Настройки</string>
     <string name="sort_by">Сортировать по</string>
-    <string name="auto_complete">Автокоректирование поиска</string>
+    <string name="auto_complete">Исправлять ошибки</string>
     <string name="performer_only">Поиск только по исполнителю</string>
     <string name="preferences">Mypref</string>
     <string name="like">Понравилось</string>
     <string name="cleared_histoty">Істория удалена</string>
     <string name="input_search_query">Введите поисковый запрос</string>
-    <string name="clear_history">Удалить историю поиска</string>
+    <string name="clear_history">Очистить историю поиска</string>
     <string name="nothing_search">Ничего не найдено(</string>
     <string name="downloading">загрузка . . .</string>
     <string name="player">Проигрыватель</string>
     <string name="buffering">...буферизация...</string>
     <string name="current_play_list">Текуший плейлист</string>
-    <string name="pref_search">Настройки поиска</string>
+    <string name="pref_search">Поиск</string>
     <string-array name="list_of_type_sort">
         <item>Популярности</item>
         <item>Время композиции</item>
@@ -38,5 +38,18 @@
     <string name="wait">Подождите. Сохранение...</string>
     <string name="size">"Размер файла: "</string>
     <string name="is_in_my_music">Даная композиция уже была добавлена в ваши аудиозаписи</string>
-    <string name="wait_add_fav">Зачакайте</string>
+    <string name="network_error">Ошибка сети</string>
+    <string name="bitsstream_error">Ошибка кодирования</string>
+    <string name="name_info">Название композиции</string>
+    <string name="author_info">Исполнитель</string>
+    <string name="time_info">Время композиции</string>
+    <string name="text_info">Текст</string>
+    <string name="genre_info">Жанр</string>
+    <string name="size_info">Размер</string>
+    <string name="no_data">Информация отсутсвует</string>
+    <string name="enter">Ввойти</string>
+    <string name="setting_download">Загрузка</string>
+    <string name="select_folder">Папка для загруженых файлов</string>
+    <string name="clear_history_download">Очистить историю загрузок</string>
+    <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>

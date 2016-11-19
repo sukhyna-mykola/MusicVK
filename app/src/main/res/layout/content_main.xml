@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    xmlns:htext="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,7 +23,6 @@
             android:layout_gravity="center"
             android:id="@+id/container_hint"
             android:drawableBottom="@drawable/ic_active_search"
-            android:typeface="serif"
             android:gravity="center"
             android:textSize="30sp"
             android:text="@string/input_search_query"

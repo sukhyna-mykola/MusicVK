@@ -10,7 +10,7 @@
     <string name="exit">Вийти</string>
     <string name="setting">Налаштування</string>
     <string name="sort_by">Сортувати по</string>
-    <string name="auto_complete">Автокорегування</string>
+    <string name="auto_complete">Виправляти помилки</string>
     <string name="performer_only">Пошук тільки по виконавцю</string>
     <string name="preferences">Mypref</string>
     <string name="like">Сподобалось</string>
@@ -22,7 +22,7 @@
     <string name="player">Плеєр</string>
     <string name="buffering">...буферизація...</string>
     <string name="current_play_list">Поточний плейліст</string>
-    <string name="pref_search">Налаштування пошуку</string>
+    <string name="pref_search">Пошук</string>
     <string-array name="list_of_type_sort">
         <item>Популярності</item>
         <item>Час композиції</item>
@@ -39,5 +39,19 @@
     <string name="wait">Зачекайте. Триває завантаження</string>
     <string name="size">"Розмір файлу: "</string>
     <string name="is_in_my_music">Дана композиція є в ваших аудіозаписах</string>
-    <string name="wait_add_fav">Зачакайте</string>
+    <string name="network_error">Помилка мережі</string>
+    <string name="bitsstream_error">Помилка кодування</string>
+    <string name="name_info">Назва композиції</string>
+    <string name="author_info">Виконавець</string>
+    <string name="size_info">Розмір</string>
+    <string name="time_info">Час композиції</string>
+    <string name="text_info">Текст</string>
+    <string name="genre_info">Жанр</string>
+    <string name="no_data">Дані відсутні</string>
+
+    <string name="enter">Ввійти</string>
+    <string name="setting_download">Завантаження</string>
+    <string name="select_folder">Папка для завантажень</string>
+    <string name="clear_history_download">Видалити історію завантажень</string>
+    <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>

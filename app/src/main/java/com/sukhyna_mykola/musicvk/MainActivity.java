@@ -68,11 +68,11 @@ import static com.sukhyna_mykola.musicvk.PlayerActivity.PLAY_LIST;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private String[] scope = new String[]{VKScope.AUDIO, VKScope.FRIENDS, VKScope.PHOTOS};
 
-    ContentValues cv = new ContentValues();
-    DBHelper dbHelper;
+    private ContentValues cv = new ContentValues();
+    private DbHelper dbHelper;
 
+    private Fragment listFragment;
     private TextView nameUserView;
     private SearchView searchView;
     private RoundedImageView imageUserView;
@@ -83,11 +83,7 @@ public class MainActivity extends AppCompatActivity
     private static String[] soundHelpArray;
     private ArrayList<Sound> sounds;
 
-    private Bitmap photoUser;
-    private String nameUser;
-    private int id;
     public static String textCategory = "";
-
 
     public static final int MY_SOUNDS = 0;
     public static final int FAVORITE_SOUNDS = 1;
@@ -96,13 +92,9 @@ public class MainActivity extends AppCompatActivity
     public static final int SEARCH_SOUNDS = 4;
     public static final int PLAY_LIST_SOUNDS = 5;
     public static final int ERROR = 6;
-    
-    public static final String USER_FOLDER = "/VKMusicPlayer/.user_";
+    public static final int REQUEST_CODE = 14;
 
-    SharedPreferences sPref;
-    Fragment listFragment;
-
-
+    public static final String USER_FOLDER = "/.user_";
     private static final String TAG = "TAG";
 
 
@@ -128,7 +120,7 @@ public class MainActivity extends AppCompatActivity
                 categoryShow.animateText(textCategory);
                 if (!soundHelp.contains(query)) {
                     soundHelp.add(query);
-                    cv.put(DBHelper.NAME, query);
+                    cv.put(DbHelper.NAME, query);
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
                     db.insert(Constants.TABLE_NAME, null, cv);
                     db.close();
@@ -170,8 +162,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
-        dbHelper = new DBHelper(this);
+        dbHelper = new DbHelper(this);
         final String[] from = new String[]{"fild"};
         final int[] to = new int[]{R.id.help_sounds_id};
         mAdapter = new SimpleCursorAdapter(this,
@@ -187,6 +178,7 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
 
         FragmentManager fm = getSupportFragmentManager();
         listFragment = fm.findFragmentById(R.id.list_container);
@@ -204,9 +196,14 @@ public class MainActivity extends AppCompatActivity
                 searchView.setIconified(false);
             }
         });
+        File folder = new File(Environment.getExternalStorageDirectory() +
+                File.separator + "VKMusicPlayer");
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        //String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
+        //Log.d("finger", "finger " + Arrays.asList(fingerprints));
 
-        String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
-        Log.d("finger", "finger " + Arrays.asList(fingerprints));
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -216,21 +213,15 @@ public class MainActivity extends AppCompatActivity
 
         if (SoundLab.mUser != null) {
             setHintBackGround(false, PLAY_LIST_SOUNDS);
-        }
-        else {
+        } else {
             textCategory = getResources().getString(R.string.current_play_list);
         }
         loadSetting();
         if (!SettingActivity.logined) {
-
-            VKSdk.login(this, scope);
+            Intent startActivity = new Intent(this, StartActivity.class);
+            startActivityForResult(startActivity, REQUEST_CODE);
         } else {
-            File folder = new File(Environment.getExternalStorageDirectory() +
-                    File.separator + "VKMusicPlayer");
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-            loadUser(new File(Environment.getExternalStorageDirectory() + USER_FOLDER+SettingActivity.id));
+            loadUser(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + USER_FOLDER + SettingActivity.id));
         }
 
 
@@ -244,21 +235,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
-            @Override
-            public void onResult(VKAccessToken res) {
-                getInfo();
-
-            }
-
-            @Override
-            public void onError(VKError error) {
-                SettingActivity.logined = false;
-                saveStatusLogined();
-                finish();
-            }
-        })) {
-            super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            nameUserView.setText(SoundLab.mUser.getName().replace(" ","\n"));
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable = true;
+            Bitmap bmp = BitmapFactory.decodeByteArray(SoundLab.mUser.getPhoto(), 0, SoundLab.mUser.getPhoto().length, options);
+            imageUserView.setImageBitmap(bmp);
+        }
+        if (resultCode == RESULT_CANCELED) {
+            finish();
         }
     }
 
@@ -270,32 +255,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-
-    void getInfo() {
-        final VKRequest request = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "first_name,last_name,photo_200"));
-        request.executeWithListener(new VKRequest.VKRequestListener() {
-            @Override
-            public void onComplete(VKResponse response) {
-                super.onComplete(response);
-                VKList<VKApiUser> user = (VKList<VKApiUser>) response.parsedModel;
-
-                nameUser = user.get(0).first_name + ' ' + user.get(0).last_name;
-                nameUserView.setText(nameUser);
-
-                id = user.get(0).getId();
-                SettingActivity.id = id;
-                SettingActivity.logined = true;
-
-                saveStatusLogined();
-                File userTmp = new File(Environment.getExternalStorageDirectory() + USER_FOLDER+id);
-                if(userTmp.exists())
-                    loadUser(userTmp);else
-                new DownloadImageTask(imageUserView).execute(user.get(0).photo_200);
-            }
-        });
-
     }
 
 
@@ -331,7 +290,7 @@ public class MainActivity extends AppCompatActivity
             final VKRequest request = VKApi.audio().get();
             setListContent(request, MY_SOUNDS);
         } else if (id == R.id.nav_popular) {
-            textCategory =getResources().getString(R.string.popular);
+            textCategory = getResources().getString(R.string.popular);
             categoryShow.animateText(textCategory);
             final VKRequest request = VKApi.audio().getPopular();
             setListContent(request, POPULAR_SOUNDS);
@@ -343,7 +302,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_exit) {
             SettingActivity.logined = false;
             saveStatusLogined();
-            System.exit(0);
+            Intent startActivity = new Intent(this, StartActivity.class);
+            startActivityForResult(startActivity, REQUEST_CODE);
         } else if (id == R.id.nav_setting) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.nav_favorites) {
@@ -389,7 +349,7 @@ public class MainActivity extends AppCompatActivity
                 case RECOMENDET_SOUNDS: {
                     containerHintView.setVisibility(View.VISIBLE);
                     containerHintView.setText("");
-                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0,R.drawable.ic_sad_face);
+                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_sad_face);
                     ;
                     break;
                 }
@@ -434,7 +394,6 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     setHintBackGround(false, type);
                 }
-
                 ((SoundListFragment) listFragment).update();
 
             }
@@ -457,78 +416,32 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-            photoUser = result;
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            photoUser.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-            byte[] byteArray = stream.toByteArray();
-            SoundLab.mUser = new User(byteArray, nameUser, id);
-            final VKRequest request = VKApi.audio().get();
-
-            request.executeWithListener(new VKRequest.VKRequestListener() {
-                @Override
-                public void onComplete(VKResponse response) {
-                    super.onComplete(response);
-                    sounds = new ArrayList<Sound>();
-                    VKList<VKApiAudio> list = (VKList) response.parsedModel;
-                    for (VKApiAudio audio : list) {
-                        SoundLab.mUser.addMyMusic(new Sound(audio));
-                    }
-                }
-            });
-
-            SoundLab.saveObject();
-        }
-    }
 
     private void saveStatusLogined() {
-        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
+        SharedPreferences sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putBoolean(SettingActivity.LOGINED_KEY, SettingActivity.logined);
         ed.putInt(SettingActivity.ID_KEY, SettingActivity.id);
-
         ed.commit();
     }
 
     private void loadSetting() {
-        sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
+        SharedPreferences sPref = getSharedPreferences(getString(R.string.preferences), MODE_PRIVATE);
         SettingActivity.isRandom = sPref.getBoolean(SettingActivity.RANDOM_KEY, false);
         SettingActivity.isLooping = sPref.getBoolean(SettingActivity.LOOPING_KEY, false);
         SettingActivity.sortType = sPref.getInt(SettingActivity.SORT_TYPE_KEY, 0);
         SettingActivity.performerOnly = sPref.getInt(SettingActivity.PERFORMER_ONLY_KEY, 0);
         SettingActivity.autoComplete = sPref.getInt(SettingActivity.AUTO_COMPLETE_KEY, 0);
         SettingActivity.logined = sPref.getBoolean(SettingActivity.LOGINED_KEY, false);
-        SettingActivity.id = sPref.getInt(SettingActivity.ID_KEY, id);
+        SettingActivity.id = sPref.getInt(SettingActivity.ID_KEY, 0);
+        SettingActivity.FOLDER_DOWNLOAD = sPref.getString(SettingActivity.FOLDER_KEY, SettingActivity.FOLDER_DOWNLOAD_DEFAULT);
 
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query(Constants.TABLE_NAME, null, null, null, null, null, null);
 
         if (c.moveToFirst()) {
-            int nameColIndex = c.getColumnIndex(DBHelper.NAME);
+            int nameColIndex = c.getColumnIndex(DbHelper.NAME);
             do {
                 soundHelp.add(c.getString(nameColIndex));
             } while (c.moveToNext());
@@ -546,11 +459,8 @@ public class MainActivity extends AppCompatActivity
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap bmp = BitmapFactory.decodeByteArray(SoundLab.mUser.getPhoto(), 0, SoundLab.mUser.getPhoto().length, options);
-            photoUser = bmp;
-
-            nameUser = SoundLab.mUser.getName();
-            nameUserView.setText(nameUser);
-            imageUserView.setImageBitmap(photoUser);
+            imageUserView.setImageBitmap(bmp);
+            nameUserView.setText(SoundLab.mUser.getName().replace(" ","\n"));
 
             final VKRequest request = VKApi.audio().get();
 
@@ -558,14 +468,13 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onComplete(VKResponse response) {
                     super.onComplete(response);
-                    sounds = new ArrayList<Sound>();
                     VKList<VKApiAudio> list = (VKList) response.parsedModel;
+                    SoundLab.mUser.myMusic.clear();
                     for (VKApiAudio audio : list) {
                         SoundLab.mUser.addMyMusic(new Sound(audio));
                     }
                 }
             });
-
 
         } catch (Exception ex) {
             SoundLab.mUser = new User();
@@ -576,15 +485,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void populateAdapter(String query) {
-
         final MatrixCursor c = new MatrixCursor(new String[]{BaseColumns._ID, "fild"});
-
         soundHelpArray = soundHelp.toArray(new String[soundHelp.size()]);
-
         for (int i = 0; i < soundHelpArray.length; i++) {
             if (soundHelpArray[i].toLowerCase().startsWith(query.toLowerCase())) {
                 c.addRow(new Object[]{i, soundHelpArray[i]});
-
             }
         }
         mAdapter.changeCursor(c);

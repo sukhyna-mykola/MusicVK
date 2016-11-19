@@ -1,0 +1,127 @@
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        >
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/name_info"
+            android:textSize="19sp"
+            android:typeface="monospace"
+            />
+
+        <TextView
+            android:id="@+id/title_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:typeface="monospace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/author_info"
+            android:textSize="19sp"
+
+            />
+
+        <TextView
+            android:id="@+id/artist_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:typeface="monospace"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:typeface="monospace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/size_info"
+            android:textSize="19sp"
+            />
+
+        <TextView
+
+            android:id="@+id/size_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:typeface="monospace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/time_info"
+            android:textSize="19sp"
+            />
+
+        <TextView
+            android:id="@+id/time_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:typeface="monospace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/genre_info"
+            android:textSize="19sp"
+            />
+        <TextView
+            android:id="@+id/genre_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:paddingBottom="5dp"
+            />
+
+        <TextView
+            android:typeface="monospace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="@string/text_info"
+            android:textSize="19sp"
+            />
+        <TextView
+            android:id="@+id/text_sound_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:paddingBottom="5dp"
+            />
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

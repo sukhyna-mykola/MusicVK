@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
-                android:layout_height="128.0dip"
+                android:layout_height="100dp"
+                android:background="@color/vk_black"
                 android:padding="5dp">
 
     <ImageView
@@ -24,6 +25,7 @@
         android:padding="8.0dip"/>
 
     <LinearLayout
+        android:id="@+id/buttons_controll_layout_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -31,7 +33,6 @@
         android:layout_toRightOf="@id/status_bar_album_art"
         android:divider="?android:listDivider"
         android:dividerPadding="12.0dip"
-
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:showDividers="middle">
@@ -68,22 +69,22 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttons_controll_layout_notification"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
         android:layout_toLeftOf="@+id/status_bar_collapse"
         android:layout_toRightOf="@id/status_bar_album_art"
         android:orientation="vertical"
-        android:paddingTop="8.0dip">
+        android:paddingTop="5.0dip">
 
         <TextView
             android:id="@+id/status_bar_track_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:ellipsize="end"
             android:fadingEdge="horizontal"
-            android:focusable="true"
             android:gravity="center_horizontal|center_vertical"
             android:maxLines="1"
             android:textSize="20sp"
@@ -92,29 +93,14 @@
         <TextView
             android:id="@+id/status_bar_artist_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:ellipsize="end"
             android:fadingEdge="horizontal"
-            android:focusable="true"
             android:gravity="center_horizontal|center_vertical"
             android:maxLines="1"
-            android:textSize="15sp"
-            />
-        <TextView
-            android:id="@+id/status_bar_buffer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:ellipsize="end"
-            android:fadingEdge="horizontal"
-            android:focusable="true"
-            android:gravity="center_horizontal|center_vertical"
-            android:maxLines="1"
-            android:layout_marginBottom="5dp"
-
-
-            />
+            android:textSize="15sp"/>
+        />
 
     </LinearLayout>
 </RelativeLayout>

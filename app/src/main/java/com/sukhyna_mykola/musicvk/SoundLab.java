@@ -18,9 +18,9 @@ import java.util.List;
 public class SoundLab {
     public static SoundLab sSoundLab;
     public static User mUser;
+
     private List<Sound> mSounds;
     private List<Sound> mCurentPlayList;
-
 
     public static SoundLab get() {
         if (sSoundLab == null)
@@ -81,7 +81,9 @@ public class SoundLab {
     public static void saveObject() {
         if (!mUser.isTmpUser())
             try {
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(Environment.getExternalStorageDirectory() + MainActivity.USER_FOLDER + mUser.getId()))); //Select where you wish to save the file...
+
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(
+                        new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ MainActivity.USER_FOLDER + mUser.getId()))); //Select where you wish to save the file...
                 oos.writeObject(mUser); // write the class as an 'object'
                 oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
                 oos.close();// close the stream

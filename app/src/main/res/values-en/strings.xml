@@ -4,7 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="current_play_list">Playlist</string>
-    <string name="pref_search">Settings serch</string>
+    <string name="pref_search">Search</string>
     <string name="my_music">My Music</string>
     <string name="popular">Popular</string>
     <string name="recomend">Recommendations</string>
@@ -17,7 +17,7 @@
     <string name="like">Like</string>
     <string name="cleared_histoty">History cleared</string>
     <string name="input_search_query">Enter a search query</string>
-    <string name="clear_history">Clear history</string>
+    <string name="clear_history">Clear history search</string>
     <string name="nothing_search">Nothing found( \n Try again</string>
     <string name="downloading">downloading . . .</string>
     <string name="player">Player</string>
@@ -37,5 +37,18 @@
     <string name="wait">Wait. Saving ...</string>
     <string name="size">"size: "</string>
     <string name="is_in_my_music">Sound is in My music</string>
-    <string name="wait_add_fav">Зачакайте</string>
+    <string name="network_error">Network error</string>
+    <string name="bitsstream_error">coding error</string>
+    <string name="name_info">Title</string>
+    <string name="author_info">Author</string>
+    <string name="time_info">Time</string>
+    <string name="text_info">Text</string>
+    <string name="size_info">Size</string>
+    <string name="genre_info">Genre</string>
+    <string name="no_data">-</string>
+    <string name="enter">Log In</string>
+    <string name="setting_download">Downloading</string>
+    <string name="select_folder">Folder for download</string>
+    <string name="clear_history_download">Clear history download</string>
+    <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>
