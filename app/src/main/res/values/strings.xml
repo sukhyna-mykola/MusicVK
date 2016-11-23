@@ -51,5 +51,7 @@
     <string name="setting_download">Завантаження</string>
     <string name="select_folder">Папка для завантажень</string>
     <string name="clear_history_download">Видалити історію завантажень</string>
+    <string name="down_in_downloads">Файл буде завантажено в папку /Downloads</string>
+    <string name="added_to_my_music">Композиція %1$s додана в ваші аудіозаписи</string>
     <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>

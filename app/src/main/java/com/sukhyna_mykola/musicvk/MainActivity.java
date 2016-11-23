@@ -196,11 +196,11 @@ public class MainActivity extends AppCompatActivity
                 searchView.setIconified(false);
             }
         });
-        File folder = new File(Environment.getExternalStorageDirectory() +
-                File.separator + "VKMusicPlayer");
+        File folder = new File(SettingActivity.FOLDER_DOWNLOAD_DEFAULT);
         if (!folder.exists()) {
             folder.mkdirs();
         }
+
         //String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
         //Log.d("finger", "finger " + Arrays.asList(fingerprints));
 
@@ -217,6 +217,12 @@ public class MainActivity extends AppCompatActivity
             textCategory = getResources().getString(R.string.current_play_list);
         }
         loadSetting();
+
+        folder = new File(SettingActivity.FOLDER_DOWNLOAD);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
         if (!SettingActivity.logined) {
             Intent startActivity = new Intent(this, StartActivity.class);
             startActivityForResult(startActivity, REQUEST_CODE);
@@ -236,7 +242,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            nameUserView.setText(SoundLab.mUser.getName().replace(" ","\n"));
+            nameUserView.setText(SoundLab.mUser.getName().replace(" ", "\n"));
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap bmp = BitmapFactory.decodeByteArray(SoundLab.mUser.getPhoto(), 0, SoundLab.mUser.getPhoto().length, options);
@@ -460,7 +466,7 @@ public class MainActivity extends AppCompatActivity
             options.inMutable = true;
             Bitmap bmp = BitmapFactory.decodeByteArray(SoundLab.mUser.getPhoto(), 0, SoundLab.mUser.getPhoto().length, options);
             imageUserView.setImageBitmap(bmp);
-            nameUserView.setText(SoundLab.mUser.getName().replace(" ","\n"));
+            nameUserView.setText(SoundLab.mUser.getName().replace(" ", "\n"));
 
             final VKRequest request = VKApi.audio().get();
 

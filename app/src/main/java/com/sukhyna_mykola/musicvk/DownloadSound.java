@@ -39,7 +39,14 @@ public class DownloadSound {
         mDownloadManager = (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
         Uri uri = Uri.parse(downloadURL);
         final DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setDestinationInExternalPublicDir(SettingActivity.FOLDER_DOWNLOAD.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), sound.title + ".mp3");
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            if (!new File(SettingActivity.FOLDER_DOWNLOAD).exists())
+                new File(SettingActivity.FOLDER_DOWNLOAD).mkdir();
+            request.setDestinationInExternalPublicDir(SettingActivity.FOLDER_DOWNLOAD.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), sound.title + ".mp3");
+        } else {
+            Toast.makeText(context, context.getResources().getString(R.string.down_in_downloads), Toast.LENGTH_SHORT).show();
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, sound.title + ".mp3");
+        }
 
         //обчислення розміру файла
         new Thread(new Runnable() {

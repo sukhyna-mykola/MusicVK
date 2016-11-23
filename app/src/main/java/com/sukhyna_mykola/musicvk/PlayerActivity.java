@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
@@ -212,6 +213,10 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                     secondaryProgress.setProgress(0);
                     curentPos = SoundLab.get().getCurentPlayList().indexOf(SoundLab.get().getSound(id));
                     progressMusic.setMax(mSound.getDuration());
+
+                    if (mSoundInfoFragment != null) {
+                        hideInfo();
+                    }
                     pager.setCurrentItem(curentPos);
 
                 }
@@ -344,16 +349,10 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
             }
             case R.id.player_next_sound: {
                 sendActionToService(MusicService.PARAM_NEXT_SOUND);
-                if (mSoundInfoFragment != null) {
-                    hideInfo();
-                }
                 break;
             }
             case R.id.player_prev_sound: {
                 sendActionToService(MusicService.PARAM_PREV_SOUND);
-                if (mSoundInfoFragment != null) {
-                    hideInfo();
-                }
                 break;
             }
             case R.id.player_list_sounds_btn: {
@@ -392,13 +391,22 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                         @Override
                         public void onComplete(VKResponse response) {
                             super.onComplete(response);
-                            Toast.makeText(PlayerActivity.this, "Композиція " + mSound.getTitle() + " додана в ваші аудіозаписи", Toast.LENGTH_SHORT).show();
+                            SoundLab.mUser.addMyMusic(mSound);
+                            updateButtons();
+                            Toast.makeText(PlayerActivity.this,getResources().getString(R.string.added_to_my_music,mSound.getTitle()), Toast.LENGTH_SHORT).show();
+                        }
+                        @Override
+                        public void onError(VKError error) {
+                            super.onError(error);
+                            Toast.makeText(PlayerActivity.this, getResources().getString(R.string.eror), Toast.LENGTH_SHORT).show();
                         }
                     });
-                    SoundLab.mUser.addMyMusic(mSound);
-                    updateButtons();
-                } else
-                    Toast.makeText(this, com.sukhyna_mykola.musicvk.R.string.is_in_my_music, Toast.LENGTH_SHORT).show();
+
+
+                } else{
+                    Toast.makeText(this, getResources().getString(R.string.is_in_my_music), Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             }
             case R.id.player_favorite: {

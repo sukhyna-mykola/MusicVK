@@ -24,7 +24,6 @@ public class User implements Serializable {
     }
 
 
-
     public byte[] getPhoto() {
         return photo;
     }
@@ -59,6 +58,7 @@ public class User implements Serializable {
         myMusic = new ArrayList<>();
 
     }
+
     public User() {
         tmpUser = true;
         downloadedSounds = new ArrayList<>();
@@ -66,6 +66,7 @@ public class User implements Serializable {
         myMusic = new ArrayList<>();
 
     }
+
     public void addDownloadedDound(int id) {
         downloadedSounds.add(id);
     }
@@ -85,9 +86,10 @@ public class User implements Serializable {
     public void removeSoundFromFavorites(int idSound) {
         int indexRemove = -1;
         for (int i = 0; i < favoritesSounds.size(); i++) {
-            if (favoritesSounds.get(i).getId() == idSound) ;
-            indexRemove = i;
-            break;
+            if (favoritesSounds.get(i).getId() == idSound) {
+                indexRemove = i;
+                break;
+            }
         }
         if (indexRemove != -1)
             favoritesSounds.remove(indexRemove);
@@ -103,14 +105,13 @@ public class User implements Serializable {
     }
 
     public boolean containtSoundFavorite(int idSound) {
-
         for (int i = 0; i < favoritesSounds.size(); i++) {
             if (favoritesSounds.get(i).getId() == idSound)
                 return true;
         }
-
         return false;
     }
+
     public boolean containtMyMusic(int idSound) {
         for (int i = 0; i < myMusic.size(); i++) {
             if (myMusic.get(i).getId() == idSound)
@@ -124,10 +125,10 @@ public class User implements Serializable {
             if (favoritesSounds.get(i).getId() == idSound)
                 return favoritesSounds.get(i);
         }
-
         return null;
     }
-    public  void clearHistoryDownload(){
+
+    public void clearHistoryDownload() {
         downloadedSounds.clear();
         downloadedSounds = new ArrayList<>();
     }

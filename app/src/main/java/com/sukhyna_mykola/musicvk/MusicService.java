@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -140,7 +141,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             Log.i(TAG_MusicService, "Constants.ACTION.STARTFOREGROUND_ACTION");
-
             currentSound = SoundLab.get().getSound(intent.getIntExtra(PARAM_POS, -1));
             position = SoundLab.get().getCurentPlayList().indexOf(currentSound);
 
@@ -239,12 +239,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         setNotificationIntent();
         NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setPriority(Notification.PRIORITY_MAX);
 
-        if (mediaPlayer.isPlaying())
+        if (mediaPlayer.isPlaying()) {
             builder.setSmallIcon(R.drawable.ic_play_arrow_white_24dp);
-        else
+        } else {
             builder.setSmallIcon(R.drawable.ic_pause_white_24dp);
+
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             builder = builder.setCustomBigContentView(getComplexNotificationView());

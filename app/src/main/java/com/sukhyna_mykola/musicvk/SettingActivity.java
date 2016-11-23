@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 import net.rdrei.android.dirchooser.DirectoryChooserConfig;
 
+import java.io.File;
 import java.security.cert.CertPath;
 
 public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
@@ -53,7 +54,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private Button selectFolderDownload;
     private Button clearHistoryDownload;
 
-    public static final String FOLDER_DOWNLOAD_DEFAULT = Environment.getExternalStorageDirectory().getAbsolutePath() + "/VKMusicPlayer";
+    public static final String FOLDER_DOWNLOAD_DEFAULT = Environment.getExternalStorageDirectory().getAbsolutePath() +
+            File.separator + "VKMusicPlayer";
     public static String FOLDER_DOWNLOAD;
 
     @Override

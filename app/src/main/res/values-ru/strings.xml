@@ -51,5 +51,7 @@
     <string name="setting_download">Загрузка</string>
     <string name="select_folder">Папка для загруженых файлов</string>
     <string name="clear_history_download">Очистить историю загрузок</string>
+    <string name="down_in_downloads">Файл будет загружен  в папку /Downloads</string>
+    <string name="added_to_my_music">Композиция %1$s добавлена в ваши аудиозаписи</string>
     <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>
