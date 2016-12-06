@@ -9,13 +9,13 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.BaseColumns;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -30,15 +30,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hanks.htextview.HTextView;
-import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKCallback;
-import com.vk.sdk.VKScope;
-import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -46,24 +42,14 @@ import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiAudio;
-import com.vk.sdk.api.model.VKApiUser;
 import com.vk.sdk.api.model.VKList;
-import com.vk.sdk.util.VKUtil;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
-
-import static com.sukhyna_mykola.musicvk.PlayerActivity.PLAY_LIST;
 
 
 public class MainActivity extends AppCompatActivity
@@ -78,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private RoundedImageView imageUserView;
     private HTextView categoryShow;
     private TextView containerHintView;
+    private ImageButton showSettingDialogImgButton;
 
     public static HashSet<String> soundHelp = new HashSet<>();
     private static String[] soundHelpArray;
@@ -97,64 +84,13 @@ public class MainActivity extends AppCompatActivity
     public static final String USER_FOLDER = "/.user_";
     private static final String TAG = "TAG";
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        // Retrieve the SearchView and plug it into SearchManager
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setSuggestionsAdapter(mAdapter);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                populateAdapter(newText);
-                return true;
-            }
-
-
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                textCategory = getString(R.string.search_result) + query;
-                categoryShow.animateText(textCategory);
-                if (!soundHelp.contains(query)) {
-                    soundHelp.add(query);
-                    cv.put(DbHelper.NAME, query);
-                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-                    db.insert(Constants.TABLE_NAME, null, cv);
-                    db.close();
-                }
-                final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q,
-                        query, VKApiConst.AUTO_COMPLETE, SettingActivity.autoComplete,
-                        VKApiConst.COUNT, 100, VKApiConst.SORT, SettingActivity.sortType, Constants.PERFORMER_ONLY, SettingActivity.performerOnly));
-                setListContent(request, SEARCH_SOUNDS);
-                return true;
-            }
-        });
-
-        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionClick(int position) {
-                ;
-                mAdapter.getCursor().moveToPosition(position);
-                int id = mAdapter.getCursor().getColumnIndex(BaseColumns._ID);
-                searchView.setQuery(soundHelpArray[mAdapter.getCursor().getInt(id)], true);
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                return false;
-            }
-        });
-
-        return true;
-
-    }
-
-
     private SimpleCursorAdapter mAdapter;
+
+    private int day;
+    private int month;
+    private int year;
+    public static boolean date;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +102,7 @@ public class MainActivity extends AppCompatActivity
         final String[] from = new String[]{"fild"};
         final int[] to = new int[]{R.id.help_sounds_id};
         mAdapter = new SimpleCursorAdapter(this,
-                R.layout.help_sound_item,
+                R.layout.item_help_sound,
                 null,
                 from,
                 to,
@@ -196,6 +132,8 @@ public class MainActivity extends AppCompatActivity
                 searchView.setIconified(false);
             }
         });
+
+
         File folder = new File(SettingActivity.FOLDER_DOWNLOAD_DEFAULT);
         if (!folder.exists()) {
             folder.mkdirs();
@@ -203,11 +141,34 @@ public class MainActivity extends AppCompatActivity
 
         //String[] fingerprints = VKUtil.getCertificateFingerprint(this, this.getPackageName());
         //Log.d("finger", "finger " + Arrays.asList(fingerprints));
+        Calendar c = Calendar.getInstance();
+        day = c.get(Calendar.DAY_OF_MONTH);
+        month = c.get(Calendar.MONTH);
+        year = c.get(Calendar.YEAR);
+        if (year >= 2016)
+            if (month >= Calendar.DECEMBER)
+                if (day >= 16) {
+                    date = true;
+                    containerHintView.setVisibility(View.VISIBLE);
+                    containerHintView.setTextColor(Color.RED);
+                    containerHintView.setText(R.string.error_end_date);
+                    containerHintView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, R.drawable.ic_sad_face);
+                }
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View hView = navigationView.getHeaderView(0);
+        showSettingDialogImgButton = (ImageButton) findViewById(R.id.show_settings_dialog_btn);
+        showSettingDialogImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                SettingDialog dialog = new SettingDialog();
+                dialog.show(fragmentManager, "dialog");
+            }
+        });
         nameUserView = (TextView) hView.findViewById(R.id.name_user);
         imageUserView = (RoundedImageView) hView.findViewById(R.id.imageView);
 
@@ -263,6 +224,63 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSuggestionsAdapter(mAdapter);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                populateAdapter(newText);
+                return true;
+            }
+
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                textCategory = getString(R.string.search_result) + query;
+                categoryShow.animateText(textCategory);
+                if (!soundHelp.contains(query)) {
+                    soundHelp.add(query);
+                    cv.put(DbHelper.NAME, query);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    db.insert(Constants.TABLE_NAME, null, cv);
+                    db.close();
+                }
+                if (!date) {
+                    final VKRequest request = VKApi.audio().search(VKParameters.from(VKApiConst.Q,
+                            query, VKApiConst.AUTO_COMPLETE, SettingActivity.autoComplete,
+                            VKApiConst.COUNT, 100, VKApiConst.SORT, SettingActivity.sortType, Constants.PERFORMER_ONLY, SettingActivity.performerOnly));
+                    setListContent(request, SEARCH_SOUNDS);
+                }
+                return true;
+            }
+        });
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
+                ;
+                mAdapter.getCursor().moveToPosition(position);
+                int id = mAdapter.getCursor().getColumnIndex(BaseColumns._ID);
+                searchView.setQuery(soundHelpArray[mAdapter.getCursor().getInt(id)], true);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+        });
+
+        return true;
+
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -281,6 +299,7 @@ public class MainActivity extends AppCompatActivity
             categoryShow.animateText(textCategory);
         }
 
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -291,20 +310,27 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_my_music) {
-            textCategory = getResources().getString(R.string.my_music);
-            categoryShow.animateText(textCategory);
-            final VKRequest request = VKApi.audio().get();
-            setListContent(request, MY_SOUNDS);
+            if (!date) {
+                textCategory = getResources().getString(R.string.my_music);
+                categoryShow.animateText(textCategory);
+                final VKRequest request = VKApi.audio().get();
+                setListContent(request, MY_SOUNDS);
+                Toast.makeText(this, R.string.info_about_my_music, Toast.LENGTH_LONG).show();
+            }
         } else if (id == R.id.nav_popular) {
-            textCategory = getResources().getString(R.string.popular);
-            categoryShow.animateText(textCategory);
-            final VKRequest request = VKApi.audio().getPopular();
-            setListContent(request, POPULAR_SOUNDS);
+            if (!date) {
+                textCategory = getResources().getString(R.string.popular);
+                categoryShow.animateText(textCategory);
+                final VKRequest request = VKApi.audio().getPopular();
+                setListContent(request, POPULAR_SOUNDS);
+            }
         } else if (id == R.id.nav_recomend) {
-            textCategory = getResources().getString(R.string.recomend);
-            categoryShow.animateText(textCategory);
-            final VKRequest request = VKApi.audio().getRecommendations();
-            setListContent(request, RECOMENDET_SOUNDS);
+            if (!date) {
+                textCategory = getResources().getString(R.string.recomend);
+                categoryShow.animateText(textCategory);
+                final VKRequest request = VKApi.audio().getRecommendations();
+                setListContent(request, RECOMENDET_SOUNDS);
+            }
         } else if (id == R.id.nav_exit) {
             SettingActivity.logined = false;
             saveStatusLogined();
@@ -467,20 +493,21 @@ public class MainActivity extends AppCompatActivity
             Bitmap bmp = BitmapFactory.decodeByteArray(SoundLab.mUser.getPhoto(), 0, SoundLab.mUser.getPhoto().length, options);
             imageUserView.setImageBitmap(bmp);
             nameUserView.setText(SoundLab.mUser.getName().replace(" ", "\n"));
+            if (!date) {
+                final VKRequest request = VKApi.audio().get();
 
-            final VKRequest request = VKApi.audio().get();
-
-            request.executeWithListener(new VKRequest.VKRequestListener() {
-                @Override
-                public void onComplete(VKResponse response) {
-                    super.onComplete(response);
-                    VKList<VKApiAudio> list = (VKList) response.parsedModel;
-                    SoundLab.mUser.myMusic.clear();
-                    for (VKApiAudio audio : list) {
-                        SoundLab.mUser.addMyMusic(new Sound(audio));
+                request.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        super.onComplete(response);
+                        VKList<VKApiAudio> list = (VKList) response.parsedModel;
+                        SoundLab.mUser.myMusic.clear();
+                        for (VKApiAudio audio : list) {
+                            SoundLab.mUser.addMyMusic(new Sound(audio));
+                        }
                     }
-                }
-            });
+                });
+            }
 
         } catch (Exception ex) {
             SoundLab.mUser = new User();

@@ -52,5 +52,10 @@
     <string name="clear_history_download">Clear history download</string>
     <string name="down_in_downloads">Downloading to folder /Downloads</string>
     <string name="added_to_my_music"> %1$s added to your music</string>
+    <string name="dont_granted">Storage permission isn\'t granted</string>
+    <string name="grant_instructions">Open Permissions and grant the Storage permission</string>
+    <string name="change_downloads_folder">"Файл буде завантажено в "</string>
+    <string name="info_about_my_music"/>
+    <string name="error_end_date">Простите, приложение больше не работает. При дальнейшем использовании возможны ошибки</string>
     <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>

@@ -53,5 +53,12 @@
     <string name="clear_history_download">Очистить историю загрузок</string>
     <string name="down_in_downloads">Файл будет загружен  в папку /Downloads</string>
     <string name="added_to_my_music">Композиция %1$s добавлена в ваши аудиозаписи</string>
+    <string name="dont_granted">Разрешение для работы с памятью не включено</string>
+    <string name="grant_instructions">Откройте Разрешения и включите разрешение Память</string>
+    <string name="change_downloads_folder">"Файл будет загружен в "</string>
+     <string name="info_about_my_music">Отображаются не все аудиозаписи, так как некоторые аудио
+       изъяты по запросу правообладателей и поэтому доступны только в официальных клиентах Вконтакте</string>
+    <string name="error_end_date">Простите, приложение больше не работает. При дальнейшем использовании возможны ошибки</string>
+
     <integer name="com_vk_sdk_AppId">5721259</integer>
 </resources>

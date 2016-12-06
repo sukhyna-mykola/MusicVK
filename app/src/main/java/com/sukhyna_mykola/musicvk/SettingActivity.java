@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 import net.rdrei.android.dirchooser.DirectoryChooserConfig;
@@ -53,6 +54,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
     private Button selectFolderDownload;
     private Button clearHistoryDownload;
+    private Button clearHistorySearch;
 
     public static final String FOLDER_DOWNLOAD_DEFAULT = Environment.getExternalStorageDirectory().getAbsolutePath() +
             File.separator + "VKMusicPlayer";
@@ -75,14 +77,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         else
             mSwitchPerformerOnly.setChecked(false);
 
-        selectFolderDownload = (Button) findViewById(R.id.select_folder);
-        selectFolderDownload.setText(FOLDER_DOWNLOAD);
-        clearHistoryDownload = (Button) findViewById(R.id.clear_download_history);
-        if (SoundLab.mUser != null) {
-            if (SoundLab.mUser.getDownloadedSounds().size() != 0)
-                clearHistoryDownload.setEnabled(true);
-            else clearHistoryDownload.setEnabled(false);
-        }
+
         mSwitchPerformerOnly.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -103,6 +98,22 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
+
+        selectFolderDownload = (Button) findViewById(R.id.select_folder);
+        selectFolderDownload.setText(FOLDER_DOWNLOAD);
+
+        clearHistoryDownload = (Button) findViewById(R.id.clear_download_history);
+        if (SoundLab.mUser != null) {
+            if (SoundLab.mUser.getDownloadedSounds().isEmpty())
+                clearHistoryDownload.setEnabled(false);
+            else clearHistoryDownload.setEnabled(true);
+        }
+        clearHistorySearch = (Button) findViewById(R.id.clear_history);
+        if (MainActivity.soundHelp.isEmpty())
+            clearHistorySearch.setEnabled(false);
+        else clearHistorySearch.setEnabled(true);
+
+
         mSpinnerSort = (Spinner) findViewById(R.id.spinner_sort);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, dataSort);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -148,12 +159,11 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.clear_history: {
-
                 MainActivity.soundHelp.clear();
                 SQLiteDatabase db = new DbHelper(SettingActivity.this).getWritableDatabase();
                 db.delete(Constants.TABLE_NAME, null, null);
                 Snackbar.make(v, R.string.cleared_histoty, Snackbar.LENGTH_SHORT).show();
-                v.setEnabled(false);
+                clearHistorySearch.setEnabled(false);
                 break;
             }
             case R.id.select_folder: {
@@ -171,7 +181,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivityForResult(chooserIntent, RESULT_CODE);
                 break;
             }
-            case R.id.clear_download_history:{
+            case R.id.clear_download_history: {
                 SoundLab.mUser.clearHistoryDownload();
                 clearHistoryDownload.setEnabled(false);
                 break;

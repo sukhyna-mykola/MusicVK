@@ -1,15 +1,22 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.os.Bundle;
@@ -36,6 +43,7 @@ import com.vk.sdk.api.VKResponse;
 
 import static com.sukhyna_mykola.musicvk.LikeService.DOWNLOADED;
 
+import static com.sukhyna_mykola.musicvk.MusicService.ALBUM_ART;
 import static com.sukhyna_mykola.musicvk.MusicService.BUFFERING;
 import static com.sukhyna_mykola.musicvk.MusicService.DATA_FROM_SERVICE;
 import static com.sukhyna_mykola.musicvk.MusicService.FINISH;
@@ -52,6 +60,7 @@ import static com.sukhyna_mykola.musicvk.MusicService.PARAM_PROGRESS;
 import static com.sukhyna_mykola.musicvk.MusicService.PARAM_PROGRESS_LOADING;
 import static com.sukhyna_mykola.musicvk.MusicService.PARAM_SEEK_TO;
 import static com.sukhyna_mykola.musicvk.MusicService.UPDATING;
+import static com.sukhyna_mykola.musicvk.StartActivity.PERMISSION_REQUEST_CODE;
 
 
 public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
@@ -85,6 +94,7 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
     private int curentPos = -1;
 
     BroadcastReceiver mBroadcastReceiver;
+
 
     private static final String TAG = "TAG";
 
@@ -166,6 +176,11 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
             public int getCount() {
                 return SoundLab.get().getCurentPlayList().size();
             }
+
+            @Override
+            public int getItemPosition(Object object) {
+                return POSITION_NONE;
+            }
         });
 
         for (int i = 0; i < SoundLab.get().getCurentPlayList().size(); i++) {
@@ -222,6 +237,9 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                 }
                 if (type == DOWNLOADED) {
                     updateButtons();
+                }
+                if (type == ALBUM_ART) {
+                    pager.getAdapter().notifyDataSetChanged();
                 }
             }
         };
@@ -335,9 +353,8 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
         ed.putBoolean(SettingActivity.LOOPING_KEY, SettingActivity.isLooping);
         ed.putBoolean(SettingActivity.RANDOM_KEY, SettingActivity.isRandom);
         ed.commit();
-
-
     }
+
 
     @Override
     public void onClick(View v) {
@@ -362,12 +379,14 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 finish();
+                break;
             }
             case R.id.player_search: {
                 Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 finish();
+                break;
             }
             case R.id.player_repeat_one: {
                 SettingActivity.isLooping = !SettingActivity.isLooping;
@@ -393,8 +412,9 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                             super.onComplete(response);
                             SoundLab.mUser.addMyMusic(mSound);
                             updateButtons();
-                            Toast.makeText(PlayerActivity.this,getResources().getString(R.string.added_to_my_music,mSound.getTitle()), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PlayerActivity.this, getResources().getString(R.string.added_to_my_music, mSound.getTitle()), Toast.LENGTH_SHORT).show();
                         }
+
                         @Override
                         public void onError(VKError error) {
                             super.onError(error);
@@ -403,7 +423,7 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                     });
 
 
-                } else{
+                } else {
                     Toast.makeText(this, getResources().getString(R.string.is_in_my_music), Toast.LENGTH_SHORT).show();
                 }
 
@@ -431,10 +451,36 @@ public class PlayerActivity extends FragmentActivity implements SeekBar.OnSeekBa
                 break;
             }
             case R.id.player_download: {
-                new DownloadSound(this, mSound);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    new DownloadSound(this, mSound);
+                } else {
+                    showNoStoragePermissionSnackbar(v);
+                }
                 break;
             }
         }
+    }
+
+       public void showNoStoragePermissionSnackbar(View v) {
+        Snackbar.make(v, com.sukhyna_mykola.musicvk.R.string.dont_granted, Snackbar.LENGTH_LONG)
+                .setAction("SETTINGS", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openApplicationSettings();
+
+                        Toast.makeText(getApplicationContext(),
+                                com.sukhyna_mykola.musicvk.R.string.grant_instructions,
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                })
+                .show();
+    }
+
+    public void openApplicationSettings() {
+        Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + getPackageName()));
+        startActivityForResult(appSettingsIntent, PERMISSION_REQUEST_CODE);
     }
 
     private void showInfo() {

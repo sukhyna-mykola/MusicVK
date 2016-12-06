@@ -1,13 +1,16 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import java.io.File;
@@ -32,22 +35,30 @@ public class DownloadSound {
     private int id;
 
     public DownloadSound(Context context, final Sound sound) {
-        downloadURL = sound.url;
+
+
         Toast.makeText(context, context.getResources().getString(R.string.downloading), Toast.LENGTH_SHORT).show();
         id = sound.id;
+        downloadURL = sound.url;
         mContext = context;
         mDownloadManager = (DownloadManager) mContext.getSystemService(mContext.DOWNLOAD_SERVICE);
         Uri uri = Uri.parse(downloadURL);
         final DownloadManager.Request request = new DownloadManager.Request(uri);
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new File(SettingActivity.FOLDER_DOWNLOAD).exists())
-                new File(SettingActivity.FOLDER_DOWNLOAD).mkdir();
-            request.setDestinationInExternalPublicDir(SettingActivity.FOLDER_DOWNLOAD.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), sound.title + ".mp3");
-        } else {
-            Toast.makeText(context, context.getResources().getString(R.string.down_in_downloads), Toast.LENGTH_SHORT).show();
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, sound.title + ".mp3");
-        }
+                try {
+                    new File(SettingActivity.FOLDER_DOWNLOAD).mkdir();
 
+                } catch (Exception e) {
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, sound.title + ".mp3");
+                    Toast.makeText(mContext, context.getString(R.string.change_downloads_folder) + Environment.DIRECTORY_DOWNLOADS.toString(), Toast.LENGTH_SHORT).show();
+                }
+            if (new File(SettingActivity.FOLDER_DOWNLOAD).exists())
+                request.setDestinationInExternalPublicDir(SettingActivity.FOLDER_DOWNLOAD.replace(Environment.getExternalStorageDirectory().getAbsolutePath(), ""), sound.title + " - " + sound.getArtist() + ".mp3");
+
+        } else {
+            return;
+        }
         //обчислення розміру файла
         new Thread(new Runnable() {
             @Override
@@ -58,7 +69,7 @@ public class DownloadSound {
         }).start();
 
 
-        request.setTitle(sound.getTitle())
+        request.setTitle(sound.getTitle()+" - "+sound.getArtist())
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
@@ -97,8 +108,9 @@ public class DownloadSound {
 
         };
         mContext.registerReceiver(receiverDownloadComplete, intentFilter);
-
     }
 
-
 }
+
+
+

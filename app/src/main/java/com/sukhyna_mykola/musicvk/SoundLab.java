@@ -1,7 +1,11 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,8 +24,9 @@ public class SoundLab {
     public static SoundLab sSoundLab;
     public static User mUser;
 
-    private List<Sound> mSounds;
-    private List<Sound> mCurentPlayList;
+    private List<Sound> mSounds = new ArrayList<>();
+    private List<Sound> mCurentPlayList = new ArrayList<>();
+    public HashMap<String, Bitmap> albumArts = new HashMap<>();
 
     public static SoundLab get() {
         if (sSoundLab == null)
@@ -83,7 +89,7 @@ public class SoundLab {
             try {
 
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(
-                        new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ MainActivity.USER_FOLDER + mUser.getId()))); //Select where you wish to save the file...
+                        new File(Environment.getExternalStorageDirectory().getAbsolutePath() + MainActivity.USER_FOLDER + mUser.getId()))); //Select where you wish to save the file...
                 oos.writeObject(mUser); // write the class as an 'object'
                 oos.flush(); // flush the stream to insure all of the information was written to 'save_object.bin'
                 oos.close();// close the stream
@@ -91,5 +97,10 @@ public class SoundLab {
 
             }
     }
+
+
+
+
+
 
 }

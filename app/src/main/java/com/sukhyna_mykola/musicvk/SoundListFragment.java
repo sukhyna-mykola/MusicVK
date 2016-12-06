@@ -1,22 +1,26 @@
 package com.sukhyna_mykola.musicvk;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.sukhyna_mykola.musicvk.LikeService.DOWNLOADED;
@@ -41,6 +44,7 @@ import static com.sukhyna_mykola.musicvk.MusicService.PARAM_POS;
 import static com.sukhyna_mykola.musicvk.MusicService.PARAM_PROGRESS;
 import static com.sukhyna_mykola.musicvk.MusicService.PARAM_TYPE;
 import static com.sukhyna_mykola.musicvk.MusicService.UPDATING;
+import static com.sukhyna_mykola.musicvk.StartActivity.PERMISSION_REQUEST_CODE;
 
 /**
  * Created by mikola on 23.10.2016.
@@ -172,11 +176,34 @@ public class SoundListFragment extends Fragment {
             mDownload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new DownloadSound(getActivity(), mSound);
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                        new DownloadSound(getActivity(), mSound);}
+                    else {showNoStoragePermissionSnackbar(v);}
+
                 }
             });
         }
+        public void showNoStoragePermissionSnackbar(View v) {
+            Snackbar.make(v, com.sukhyna_mykola.musicvk.R.string.dont_granted, Snackbar.LENGTH_LONG)
+                    .setAction("SETTINGS", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            openApplicationSettings();
 
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    com.sukhyna_mykola.musicvk.R.string.grant_instructions,
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    })
+                    .show();
+        }
+
+        public void openApplicationSettings() {
+            Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + getActivity().getPackageName()));
+            startActivityForResult(appSettingsIntent, PERMISSION_REQUEST_CODE);
+        }
 
         private Intent sendActionToService(String type) {
             Intent intent = new Intent(MusicService.DATA_TO_SERVICE);
@@ -246,7 +273,7 @@ public class SoundListFragment extends Fragment {
         @Override
         public SoundHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(R.layout.list_sounds_item, parent, false);
+            View view = layoutInflater.inflate(R.layout.item_list_sounds, parent, false);
             return new SoundHolder(view);
         }
 

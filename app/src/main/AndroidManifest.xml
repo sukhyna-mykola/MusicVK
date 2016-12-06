@@ -3,6 +3,7 @@
           package="com.sukhyna_mykola.musicvk">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
@@ -29,8 +30,7 @@
         </activity>
         <activity android:name="net.rdrei.android.dirchooser.DirectoryChooserActivity"/>
 
-        <service android:name=".MusicService">
-        </service>
+        <service android:name=".MusicService"/>
         <service android:name=".LikeService"/>
 
         <activity
@@ -47,7 +47,6 @@
             android:theme="@style/AppTheme">
         </activity>
         <activity android:name=".StartActivity">
-
         </activity>
     </application>
 

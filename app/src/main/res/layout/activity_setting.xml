@@ -34,108 +34,16 @@
                     android:orientation="vertical">
 
                     <TextView
-
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:paddingBottom="5dp"
                         android:text="@string/pref_search"
                         android:textSize="20sp"
-                        />
 
-                    <android.support.v7.widget.CardView
-                        android:id="@+id/top_catd_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp">
+                        android:textStyle="normal|bold"/>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <TextView
-                                style="?android:listSeparatorTextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-
-                                android:layout_margin="16dp"
-
-                                android:text="@string/sort_by"/>
-
-                            <Spinner
-                                android:id="@+id/spinner_sort"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-
-                                android:layout_marginLeft="16dp"
-                                android:layout_marginRight="16dp"
-                                android:paddingBottom="16dp"
-                                >
-                            </Spinner>
-
-
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
-
-                    <android.support.v7.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@+id/top_catd_view"
-                        android:layout_marginTop="5dp"
-                        android:padding="16dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <android.support.v7.widget.SwitchCompat
-                                android:id="@+id/switch_auto_complete"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_toRightOf="@+id/switch_auto_complete"
-                                android:paddingLeft="16dp"
-                                android:text="@string/auto_complete"/>
-                        </RelativeLayout>
-                    </android.support.v7.widget.CardView>
-
-                    <android.support.v7.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@+id/top_catd_view"
-                        android:layout_marginTop="5dp"
-                        android:padding="16dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="16dp">
-
-                            <android.support.v7.widget.SwitchCompat
-                                android:id="@+id/switch_performer_only"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_toRightOf="@+id/switch_performer_only"
-                                android:paddingLeft="16dp"
-                                android:text="@string/performer_only"/>
-                        </RelativeLayout>
-                    </android.support.v7.widget.CardView>
+                    <include layout="@layout/setting_search_menu"/>
 
                     <android.support.v7.widget.CardView
                         android:layout_width="match_parent"
@@ -152,7 +60,7 @@
 
                             <Button
                                 android:id="@+id/clear_history"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
                                 android:background="@drawable/selector_btn_rect"
@@ -189,8 +97,8 @@
                         android:paddingBottom="5dp"
                         android:text="@string/setting_download"
                         android:textSize="20sp"
-                        />
-
+                        android:textStyle="normal|bold"
+                        android:textIsSelectable="false"/>
 
 
                     <android.support.v7.widget.CardView
@@ -201,20 +109,21 @@
                         android:padding="16dp">
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:padding="16dp">
+
                             <TextView
                                 style="?android:listSeparatorTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/select_folder"
-                                android:layout_marginBottom="5dp"/>
+                                android:layout_marginBottom="5dp"
+                                android:text="@string/select_folder"/>
 
                             <Button
                                 android:id="@+id/select_folder"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/selector_btn_rect"
                                 android:drawableLeft="@android:drawable/ic_menu_edit"
@@ -240,7 +149,7 @@
 
                             <Button
                                 android:id="@+id/clear_download_history"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
                                 android:background="@drawable/selector_btn_rect"
@@ -251,7 +160,6 @@
 
                         </RelativeLayout>
                     </android.support.v7.widget.CardView>
-
 
 
                 </LinearLayout>

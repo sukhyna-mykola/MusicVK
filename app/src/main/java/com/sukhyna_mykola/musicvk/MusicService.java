@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 import android.app.Notification;
@@ -15,8 +16,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
@@ -54,10 +58,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     Context mContext;
 
     public final static String PARAM_TYPE = "com.sukhyna_mykola.vkmusic.PARAM_TYPE";
+
     public static final int INIT = 0;
     public static final int UPDATING = 1;
     public final static int FINISH = 2;
     public final static int BUFFERING = 3;
+    public final static int ALBUM_ART = 5;
 
     public final static String DATA_FROM_SERVICE = "com.sukhyna_mykola.vkmusic.DATE_FROM_SERVICE";
     public final static String DATA_TO_SERVICE = " com.sukhyna_mykola.vkmusic.DATA_TO_SERVICE";
@@ -119,6 +125,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 }
                 if (type.equals(PARAM_LOOP)) {
                     mediaPlayer.setLooping(SettingActivity.isLooping);
+                    return;
                 }
 
                 if (type.equals(PARAM_PLAY_SOUND_POSITION)) {
@@ -143,7 +150,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             Log.i(TAG_MusicService, "Constants.ACTION.STARTFOREGROUND_ACTION");
             currentSound = SoundLab.get().getSound(intent.getIntExtra(PARAM_POS, -1));
             position = SoundLab.get().getCurentPlayList().indexOf(currentSound);
-
             sendPos();
             sendBuffering(!playing);
 
@@ -220,6 +226,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             notificationView.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_white_24dp);
 
         // Locate and set the Text into customnotificationtext.xml TextViews
+        if (SoundLab.get().albumArts.containsKey(currentSound.getUrl())) {
+            if (SoundLab.get().albumArts.get(currentSound.getUrl()) != null)
+                notificationView.setImageViewBitmap(R.id.status_bar_album_art, SoundLab.get().albumArts.get(currentSound.getUrl()));
+            else
+                notificationView.setImageViewResource(R.id.status_bar_album_art, R.drawable.ic_music_note_white_24dp);
+        } else {
+            new getAlbum().execute(currentSound.getUrl());
+        }
 
         notificationView.setTextViewText(R.id.status_bar_track_name, currentSound.title);
 
@@ -248,7 +262,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             builder.setSmallIcon(R.drawable.ic_pause_white_24dp);
 
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             builder = builder.setCustomBigContentView(getComplexNotificationView());
         } else {
@@ -275,7 +288,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.prepareAsync();
 
+
             } else playMp3(sound.getFile());
+
+
+            //
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -392,6 +409,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         mediaPlayer.reset();
         currentSound = SoundLab.get().getCurentPlayList().get(pos);
+        updateNotification();
         initPlayer(currentSound);
 
     }
@@ -468,7 +486,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void run() {
             while (playing) {
                 try {
-                    updateNotification();
+
                     sendUpdate();
                 } catch (Exception e) {
                 }
@@ -493,6 +511,47 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+    }
+
+    public class getAlbum extends AsyncTask<String, Void, Boolean> {
+
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            SoundLab.get().albumArts.put(params[0], null);
+            try {
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
+                retriever.setDataSource(params[0], new HashMap<String, String>());
+
+                byte[] data = retriever.getEmbeddedPicture();
+                if (data != null) {
+                    SoundLab.get().albumArts.put(params[0], BitmapFactory.decodeByteArray(data, 0, data.length));
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } catch (Exception e) {
+                return false;
+            }
+
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if (aBoolean) {
+                sendAlbumArt();
+                updateNotification();
+            }
+        }
+
+        private void sendAlbumArt() {
+            intentPlayer = new Intent(DATA_FROM_SERVICE);
+            intentPlayer.putExtra(PARAM_TYPE, ALBUM_ART);
+            sendBroadcast(intentPlayer);
+        }
     }
 
 }

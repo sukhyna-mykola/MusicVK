@@ -5,38 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@color/vk_share_link_title_color"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
+    android:layout_centerInParent="true"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <com.sukhyna_mykola.musicvk.RoundedImageView
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:id="@+id/imageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:srcCompat="@android:drawable/sym_def_app_icon"/>
-
-    <TextView
-        android:layout_marginLeft="16dp"
-        android:maxLines="5"
-        android:ellipsize="end"
-        android:background="@color/transparent"
-        android:textSize="18sp"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/imageView"
+    <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:id="@+id/name_user"
-        android:text="User"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
+        <com.sukhyna_mykola.musicvk.RoundedImageView
+            android:layout_gravity="center_vertical|left"
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@android:drawable/sym_def_app_icon"/>
 
+        <TextView
+            android:id="@+id/name_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_gravity="center_vertical"
+            android:background="@color/transparent"
+            android:ellipsize="end"
+            android:maxLines="5"
+            android:padding="5dp"
+            android:text="User"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

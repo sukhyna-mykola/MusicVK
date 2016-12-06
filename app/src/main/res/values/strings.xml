@@ -54,4 +54,10 @@
     <string name="down_in_downloads">Файл буде завантажено в папку /Downloads</string>
     <string name="added_to_my_music">Композиція %1$s додана в ваші аудіозаписи</string>
     <integer name="com_vk_sdk_AppId">5721259</integer>
+    <string name="dont_granted">Разрешение для работы с памятью не включено</string>
+    <string name="grant_instructions">Откройте Разрешения и включите разрешение Память</string>
+    <string name="change_downloads_folder">"Файл буде завантажено в "</string>
+    <string name="info_about_my_music">Відображаються не всі аудіозаписи, тому що деякі аудіо
+      вилучені за запитом правовласників і тому доступні тільки в офіційних клієнтів Вконтакте</string>
+    <string name="error_end_date">Вибачте, додаток більше не працює. При подальшому використанні можливі помилки</string>
 </resources>

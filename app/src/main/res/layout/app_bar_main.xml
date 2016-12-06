@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:htext="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context="com.sukhyna_mykola.musicvk.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -21,18 +21,32 @@
             android:layout_height="wrap_content">
         </android.support.v7.widget.Toolbar>
 
-        <com.hanks.htextview.HTextView
-            android:id="@+id/category_show"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:textSize="20sp"
-            htext:animateType="anvil"
-            />
+            android:layout_height="wrap_content">
+
+            <com.hanks.htextview.HTextView
+                android:id="@+id/category_show"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/black"
+                android:padding="5dp"
+                android:textSize="20sp"
+                htext:animateType="anvil"
+                />
+
+            <ImageButton
+                android:id="@+id/show_settings_dialog_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|right"
+                android:background="@drawable/selector_btn_dialog_sett"
+                android:padding="5dp"
+                android:src="@drawable/ic_cog_analyze_512"/>
+        </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main"/>
 
 
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>
